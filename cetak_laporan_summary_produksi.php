@@ -66,25 +66,34 @@
          <div class="center-block">
             <div class="col-md-2">
                <div class="form-group">
-                  <label for="tgl">s/d Tanggal</label>
-                  <input type="date" id="tgl" name="tgl" class="form-control canChange" />
+                  <label for="dtFrom">Dari</label>
+                  <input type="date" id="dtFrom" name="dtFrom" class="form-control canChange" />
+               </div>
+            </div>
+            
+            <div class="col-md-2">
+               <div class="form-group">
+                  <label for="dtTo">Sampai</label>
+                  <input type="date" id="dtTo" name="dtTo" class="form-control canChange" />
                </div>
             </div>
 
             <div class="col-md-2">
                <div class="form-group">
-                  <label for="category">Category</label>
-                  <select id="category" name="category" class="form-control canChange">
+                  <label for="proses">Proses</label>
+                  <select id="proses" name="proses" class="form-control canChange">
                      <option value="">Semua</option>
-                     <option value="UNDERWEAR">Underwear</option>
-                     <option value="OUTERWEAR">Outerwear</option>
+                     <option value="trimstore">Trimstore</option>
+                     <option value="sewing">Sewing</option>
+                     <option value="qc_endline">QC Endline</option>
+                     <option value="packing">Packing</option>
                   </select>
                </div>
             </div>
 
             <div class="col-md-2">
                <div class="form-group">
-                  <label for="customer">Customer</label>
+                  <label for="customer">Buyer</label>
                   <select id="customer" name="customer" class="form-control canChange select2"></select>
                </div>
             </div>
@@ -102,6 +111,12 @@
          </div>
       </div>
    <!-- </div> -->
+   <div class="row text-center">
+      <div id="loading" style="display: none;">
+         Loading...
+         <img src="assets/images/loader.gif" alt="Loading" width="142" height="71" />
+      </div>
+   </div>
 
    <div class="row">
       <!-- <div class="col-12"> -->
@@ -120,18 +135,25 @@
                      <th style="background: #254681; color: white;" rowspan="2" class="text-center">Size</th>
                      <th style="background: #254681; color: white;" rowspan="2" class="text-center">Qty Order</th>
                      <th style="background: #254681; color: white;" rowspan="2">Shipment</th>
-                     <th style="background: #254681; color: white;" colspan="2" class="text-center">Trimstores</th>
-                     <th style="background: #254681; color: white;" colspan="2" class="text-center">Input Sewing</th>
-                     <th style="background: #254681; color: white;" colspan="2" class="text-center">QC Endline</th>
-                     <th style="background: #254681; color: white;" colspan="2" class="text-center">Packing</th>
+                     <th style="background: #254681; color: white;" colspan="3" class="text-center">Trimstores</th>
+                     <th style="background: #254681; color: white;" colspan="3" class="text-center">Input Sewing</th>
+                     <th style="background: #254681; color: white;" colspan="3" class="text-center">QC Endline</th>
+                     <th style="background: #254681; color: white;" colspan="3" class="text-center">Packing</th>
                   </tr>
                   <tr>
+                     <th style="background: #254681; color: white;">Tgl</th>
                      <th style="background: #254681; color: white;">Input</th>
                      <th style="background: #254681; color: white;">Balance</th>
+
+                     <th style="background: #254681; color: white;">Tgl</th>
                      <th style="background: #254681; color: white;">Input</th>
                      <th style="background: #254681; color: white;">Balance</th>
+
+                     <th style="background: #254681; color: white;">Tgl</th>
                      <th style="background: #254681; color: white;">Output</th>
                      <th style="background: #254681; color: white;">Balance</th>
+
+                     <th style="background: #254681; color: white;">Tgl</th>
                      <th style="background: #254681; color: white;">Output</th>
                      <th style="background: #254681; color: white;">Balance</th>
                   </tr>
@@ -143,9 +165,9 @@
 </div>
 
 <script src="assets/js/select2.min.js"></script>
-<script src="assets/DataTables/js/dataTables.buttons.min.js"></script>
+<!-- <script src="assets/DataTables/js/dataTables.buttons.min.js"></script> -->
 <!-- <script src="assets/DataTables/js/buttons.dataTables.js"></script> -->
-<script src="assets/DataTables/js/jszip.min.js"></script>
+<!-- <script src="assets/DataTables/js/jszip.min.js"></script> -->
 
 
 <script>
@@ -156,7 +178,8 @@
       const day = now.getDate().toString().padStart(2, '0');
       const strDate = `${year}-${month}-${day}`;
 
-      $('#tgl').val(strDate);
+      $('#dtFrom').val(strDate);
+      $('#dtTo').val(strDate);
 
       $('.select2').select2({
          theme: 'bootstrap4',
@@ -172,7 +195,7 @@
             // 'pdf',
             // 'print'
       //   ],
-         // paging: false,
+         paging: false,
          destroy: true,
          deferRender: true,
          scrollY: 490,
@@ -181,7 +204,7 @@
          searching: false,
          columnDefs: [
             {
-               targets: [0,7,8,10,11,12,13,14,15,16,17],
+               targets: [0,7,8,10,11,12,13,14,15,16,17,18,19,20,21],
                className: 'dt-center'
             },
          ]
@@ -258,17 +281,24 @@
       }
 
       $('#btnFilter').click(function(){
-         let tgl = $('#tgl').val();
-         let kategori = $('#category').val();
+         $('#loading').show();
+         tableSumProduksi.clear().draw();
+
+         let dtFrom = $('#dtFrom').val();
+         let dtTo = $('#dtTo').val();
+         let proses = $('#proses').val();
          let buyer = $('#customer').val();
          let line = $('#line').val();
 
-         let param = {
-            'tgl': tgl,
-            'kategori': kategori,
+         let p = {
+            'dtFrom': dtFrom,
+            'dtTo': dtTo,
+            'proses': proses,
             'buyer': buyer,
             'line': line
          };
+         let param = JSON.stringify(p);
+         console.log(typeof param);
          $.ajax({
             type: 'GET',
             url: 'functions/ajax_functions_handler.php',
@@ -278,7 +308,7 @@
             },
             dataType: 'JSON',
          }).done(function(dataReturn){
-            tableSumProduksi.clear();
+            $('#loading').hide();
             if(dataReturn.length > 0){
                for(let x = 0; x < dataReturn.length; x++){
                   tableSumProduksi.row.add([
@@ -292,14 +322,22 @@
                      dataReturn[x].size,
                      dataReturn[x].qty_order,
                      dataReturn[x].shipment,
-                     parseInt(dataReturn[x].input_trimstore),
-                     parseInt(dataReturn[x].balance_trimstore),
-                     parseInt(dataReturn[x].input_sewing),
-                     parseInt(dataReturn[x].balance_sewing),
-                     parseInt(dataReturn[x].output_qcendline),
-                     parseInt(dataReturn[x].balance_qcendline),
-                     parseInt(dataReturn[x].output_packing),
-                     parseInt(dataReturn[x].balance_packing)
+
+                     dataReturn[x].tgl_trimstore ?? "-",
+                     dataReturn[x].output_trimstore ?? 0, 
+                     dataReturn[x].balance_trimstore ?? 0,
+                     
+                     dataReturn[x].tgl_sewing ?? "-",
+                     dataReturn[x].output_sewing ?? 0,
+                     dataReturn[x].balance_sewing ?? 0,
+
+                     dataReturn[x].tgl_qc_endline ?? "-",
+                     dataReturn[x].output_qc_endline ?? 0,
+                     dataReturn[x].balance_qc_endline ?? 0,
+
+                     dataReturn[x].tgl_packing ?? "-",
+                     dataReturn[x].output_packing ?? 0,
+                     dataReturn[x].balance_packing ?? 0
                   ]).draw();
                }
             }

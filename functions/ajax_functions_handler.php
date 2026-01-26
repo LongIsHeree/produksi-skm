@@ -493,24 +493,51 @@ function getAllProductionSummary($arrP){
    $dtTo = $arrP->dtTo;
    $buyer = $arrP->buyer;
    $line = $arrP->line;
-   $orc = $arrP->orc;
-   $style = $arrP->style;
-   $po = $arrP->po;
+   // $orc = $arrP->orc;
+   // $style = $arrP->style;
+   // $po = $arrP->po;
 
    global $koneksi;
 
    $mainQuery = "SELECT `line`, buyer, po, `orc`, style, color, `size`, qty_order, shipment_plan,
-               tgl_".$proses . ", output_".$proses. ", balance_".$proses . " FROM view_production_summary_all
-               WHERE (tgl_".$proses. " >= '$dtFrom' AND tgl_".$proses. " <= '$dtTo')";
+               tgl_trimstore, output_trimstore, balance_trimstore,
+               tgl_sewing, output_sewing, balance_sewing,
+               tgl_qc_endline, output_qc_endline, balance_qc_endline,
+               tgl_packing, output_packing, balance_packing
+               FROM view_production_summary_all";
+               // WHERE (tgl_".$proses. " >= '$dtFrom' AND tgl_".$proses. " <= '$dtTo')";
 
-   $buyerQuery = " AND buyer LIKE '%$buyer%'";
-   $lineQuery = " AND `line` = '$line'";
-   $orcrQuery = " AND `orc` LIKE '%$orc%'";
-   $styleQuery = " AND style LIKE '%$style%'";
-   $poQuery = " AND po LIKE '%$po%'";
-   $orderBy = " ORDER BY tgl_".$proses . " DESC";
+   if($proses != ''){
+      $whereQuery = " WHERE (tgl_".$proses. " >= '$dtFrom' AND tgl_".$proses. " <= '$dtTo')";
+   }else{
+      $whereQuery = " WHERE (tgl_trimstore >= '$dtFrom' AND tgl_cutting <= '$dtTo') OR (tgl_sewing >= '$dtFrom' AND tgl_sewing <= '$dtTo') OR (tgl_qc_endline >= '$dtFrom' AND tgl_qc_endline <= '$dtTo') OR (tgl_packing >= '$dtFrom' AND tgl_packing <= '$dtTo')";
+   }
+   $buyerQuery = ($buyer != '' ? " AND buyer = '$buyer' " : '');
+   $lineQuery = ($line != '' ? " AND `line` = '$line' " : '');
 
-   $query = $mainQuery . ($buyer != '' ? $buyerQuery : '') . ($line != '' ? $lineQuery : '') . ($orc != '' ? $orcrQuery : '') . ($style != '' ? $styleQuery : '') . ($po != '' ? $poQuery : '') . $orderBy;
+   // if($proses != ''){
+   //    // $whereQuery = " WHERE (tgl_".$proses. " >= '$dtFrom' AND tgl_".$proses. " <= '$dtTo')";
+   //    // $buyerQuery = " AND buyer LIKE " . ($buyer != '' ? " '%$buyer%' " : '');
+   //    $buyerQuery = ($buyer != '' ? " AND buyer LIKE '%$buyer%' " : '');
+   //    // $lineQuery = " AND `line` = '$line'";
+   //    // $lineQuery = " AND `line` = " . ($line != '' ? " '$line' " : "");
+   // }else{
+   //    // $whereQuery = '';
+   //    $buyerQuery = ($buyer != '' ? " AND buyer LIKE '%$buyer%' " : "");
+   // }
+   // // $lineQuery = " AND `line` = " . ($line != '' ? " '$line' " : '');
+   // $lineQuery = ($line != '' ? " AND `line` = '$line' " : '');
+
+   // // $orcrQuery = " AND `orc` LIKE '%$orc%'";
+   // // $styleQuery = " AND style LIKE '%$style%'";
+   // // $poQuery = " AND po LIKE '%$po%'";
+   $orderBy = " ORDER BY tgl_trimstore DESC";
+
+   // $query = $mainQuery . ($buyer != '' ? $buyerQuery : '') . ($line != '' ? $lineQuery : '') . ($orc != '' ? $orcrQuery : '') . ($style != '' ? $styleQuery : '') . ($po != '' ? $poQuery : '') . $orderBy;
+
+   // $query = $mainQuery . ($buyer != '' ? $buyerQuery : '') . ($line != '' ? $lineQuery : '') .  $orderBy;
+
+   $query = $mainQuery . $whereQuery . $buyerQuery . $lineQuery;
 
    $response = mysqli_query($koneksi, $query);
    $data = [];
@@ -525,9 +552,22 @@ function getAllProductionSummary($arrP){
          'size' => $r['size'],
          'qty_order' => $r['qty_order'],
          'shipment' => $r['shipment_plan'],
-         'tgl_'.$proses => $r['tgl_'.$proses],
-         'output' => $r['output_'.$proses],
-         'balance' => $r['balance_'.$proses],
+
+         'tgl_trimstore' => $r['tgl_trimstore'],
+         'output_trimstore' => $r['output_trimstore'],
+         'balance_trimstore' => $r['balance_trimstore'],
+
+         'tgl_sewing' => $r['tgl_sewing'],
+         'output_sewing' => $r['output_sewing'],
+         'balance_sewing' => $r['balance_sewing'],
+
+         'tgl_qc_endline' => $r['tgl_qc_endline'],
+         'output_qc_endline' => $r['output_qc_endline'],
+         'balance_qc_endline' => $r['balance_qc_endline'],
+
+         'tgl_packing' => $r['tgl_packing'],
+         'output_packing' => $r['output_packing'],
+         'balance_packing' => $r['balance_packing'],
       ];
       array_push($data, $row);
    }
