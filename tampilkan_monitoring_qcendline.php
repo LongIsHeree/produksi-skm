@@ -10,7 +10,7 @@ function get_output_qcChart_endline_yesterday($tgl){
     $yesterday = $date->format('Y-m-d');
 
     $query = "SELECT 
-                line
+                line,
                 SUM(qty) AS Output_Yesterday
               FROM transaksi_qc_endline
               WHERE tanggal = '$yesterday'
