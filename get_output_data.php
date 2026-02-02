@@ -1,16 +1,16 @@
 <?php
-include 'dbconnect.php';
+require_once 'core/init.php';
 date_default_timezone_set('Asia/Jakarta');
 
 $tgl = date('Y-m-d');
-
-function getData($conn, $tgl){
+global $koneksi;
+function getData($koneksi, $tgl){
     $query = "SELECT line, SUM(qty) as qty
               FROM transaksi_qc_endline
               WHERE tanggal = '$tgl'
               GROUP BY line
               ORDER BY line";
-    $res = mysqli_query($conn, $query);
+    $res = mysqli_query($koneksi, $query);
 
     $data = [];
     while($r = mysqli_fetch_assoc($res)){
@@ -19,11 +19,11 @@ function getData($conn, $tgl){
     return $data;
 }
 
-$today = getData($conn_produksi, $tgl);
+$today = getData($koneksi, $tgl);
 
 $date = new DateTime($tgl);
 $date->modify('-1 day');
-$yesterday = getData($conn_produksi, $date->format('Y-m-d'));
+$yesterday = getData($koneksi, $date->format('Y-m-d'));
 
 echo json_encode([
     "today" => $today,
