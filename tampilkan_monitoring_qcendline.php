@@ -10,7 +10,7 @@ function get_output_qcChart_endline_yesterday($tgl){
     $yesterday = $date->format('Y-m-d');
 
     $query = "SELECT 
-                line, 
+                line
                 SUM(qty) AS Output_Yesterday
               FROM transaksi_qc_endline
               WHERE tanggal = '$yesterday'
@@ -355,7 +355,7 @@ foreach($allLines as $l){
                 text: 'Output Qty'
             }
         },
-        colors: ['#ff0000', '#008FFB'],
+        colors: ['#008FFB', '#00fba3'],
         plotOptions: {
             bar: {
                 horizontal: false
