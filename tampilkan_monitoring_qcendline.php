@@ -412,7 +412,7 @@ function fetchDataAndUpdate(){
 fetchDataAndUpdate();
 
 // refresh tiap 10 detik
-setInterval(fetchDataAndUpdate, 5000);
+setInterval(fetchDataAndUpdate, 30000);
 
     // Fungsi untuk memperbarui waktu secara dinamis
     function updateTime() {
