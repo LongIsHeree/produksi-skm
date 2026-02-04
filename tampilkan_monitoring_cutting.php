@@ -2,52 +2,34 @@
 require_once 'core/init.php';
 
 date_default_timezone_set('Asia/Jakarta'); // penting
-function get_output_qcChart_endline_yesterday($tgl){
+function getTotalToday($tgl){
     global $koneksi;
+    $q = mysqli_query($koneksi,"
+        SELECT COALESCE(SUM(qty),0) AS total
+        FROM transaksi_cutting
+        WHERE tanggal = '$tgl'
+    ");
+    return mysqli_fetch_assoc($q)['total'] ?? 0;
+}
 
+function getTotalYesterday($tgl){
+    global $koneksi;
     $date = new DateTime($tgl);
     $date->modify('-1 day');
     $yesterday = $date->format('Y-m-d');
 
-    $query = "SELECT 
-                line,
-                SUM(qty) AS Output_Yesterday
-              FROM transaksi_qc_endline
-              WHERE tanggal = '$yesterday'
-              GROUP BY line
-              ORDER BY line";
-    return mysqli_query($koneksi, $query);
-}
-
-function get_output_qcChart_endline($tgl){
-      global $koneksi;
-
-    $query = "SELECT 
-                line, 
-                SUM(qty) AS Output_Today
-              FROM transaksi_qc_endline
-              WHERE tanggal = '$tgl'
-              GROUP BY line
-              ORDER BY line";
-
-    return mysqli_query($koneksi, $query);
-}
-
-function fetch_assoc_all($result){
-    $rows = [];
-    while($r = mysqli_fetch_assoc($result)){
-        $rows[] = $r;
-    }
-    return $rows;
+    $q = mysqli_query($koneksi,"
+        SELECT COALESCE(SUM(qty),0) AS total
+        FROM transaksi_cutting
+        WHERE tanggal = '$yesterday'
+    ");
+    return mysqli_fetch_assoc($q)['total'] ?? 0;
 }
 
 $tgl = date('Y-m-d');
+$totalToday = getTotalToday($tgl);
+$totalYesterday = getTotalYesterday($tgl);
 
-
-// echo $tgl;
-// die();
-$today = fetch_assoc_all(get_output_qcChart_endline($tgl));
-$yesterday = fetch_assoc_all(get_output_qcChart_endline_yesterday($tgl));
 
 
 ?>
@@ -168,7 +150,7 @@ $yesterday = fetch_assoc_all(get_output_qcChart_endline_yesterday($tgl));
                                 <div class="row">
                                     <div class="col">
                                         <h3>
-                                            <center><strong>Output Today </strong></center>
+                                            <center><strong>TODAY & YESTERDAY OUTPUT CHART </strong></center>
                                         </h3>
                                         <div id="todayChart"></div>
                                     </div>
@@ -179,7 +161,7 @@ $yesterday = fetch_assoc_all(get_output_qcChart_endline_yesterday($tgl));
                     <div class="col-md-5">
                         <div class="card shadow mb-4">
                             <div class="card-body">
-                                <h2><i class="fas fa-bullhorn"></i> QC ENDLINE OUTPUT</h2>
+                                <h2><i class="fas fa-bullhorn"></i> CUTTING TODAY & YESTERDAY OUTPUT</h2>
                                 <br>
                                 <table id="outputTable" class="table-striped table-hover">
                                     <thead>
@@ -188,59 +170,27 @@ $yesterday = fetch_assoc_all(get_output_qcChart_endline_yesterday($tgl));
                                                 <center>NO</center>
                                             </th>
                                             <th>
-                                                <center>Line</center>
+                                                <center>Output Yesterday</center>
                                             </th>
                                             <th>
-                                                <center>Sewing Yesterday</center>
-                                            </th>
-                                            <th>
-                                                <center>Sewing Today</center>
+                                                <center>Output Today</center>
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php
 $no = 1;
-$lines = [];
 
-// Gabungkan semua line unik
-foreach($today as $t) $lines[$t['line']] = true;
-foreach($yesterday as $y) $lines[$y['line']] = true;
-
-foreach(array_keys($lines) as $line){
-
-    $today_qty = 0;
-    foreach($today as $t){
-        if($t['line'] == $line){
-            $today_qty = $t['Output_Today'];
-            break;
-        }
-    }
-
-    $y_qty = 0;
-    foreach($yesterday as $y){
-        if($y['line'] == $line){
-            $y_qty = $y['Output_Yesterday'];
-            break;
-        }
-    }
 ?>
 
                                         <tr>
                                             <td>
                                                 <center><?= $no++ ?></center>
                                             </td>
-                                            <td>
-                                                <center><?= $line ?></center>
-                                            </td>
-                                            <td>
-                                                <center><?= $y_qty ?></center>
-                                            </td>
-                                            <td>
-                                                <center><?= $today_qty ?></center>
-                                            </td>
+                                            <td><center><?= $totalYesterday ?></center></td>
+                                            <td><center><?= $totalToday ?></center></td>
                                         </tr>
-                                        <?php } ?>
+                                     
                                     </tbody>
 
                                 </table>
@@ -271,27 +221,11 @@ foreach(array_keys($lines) as $line){
     </footer>
 
     <?php
-$chart_lines = [];
-$chart_today = [];
-$chart_yesterday = [];
 
-$mapToday = [];
-foreach($today as $t) $mapToday[$t['line']] = (int)$t['Output_Today'];
 
-$mapYesterday = [];
-foreach($yesterday as $y) $mapYesterday[$y['line']] = (int)$y['Output_Yesterday'];
 
-$allLines = array_unique(array_merge(array_keys($mapToday), array_keys($mapYesterday)));
-sort($allLines);
 
-foreach($allLines as $l){
-    $chart_lines[] = $l;
-    $chart_today[] = $mapToday[$l] ?? 0;
-    $chart_yesterday[] = $mapYesterday[$l] ?? 0;
-}
 ?>
-
-
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -326,92 +260,65 @@ foreach($allLines as $l){
             }
         });
     });
-    const lines = <?= json_encode($chart_lines) ?>;
-    const todayData = <?= json_encode($chart_today) ?>;
-    const yesterdayData = <?= json_encode($chart_yesterday) ?>;
+    const todayData = <?= json_encode($totalToday) ?>;
+    const yesterdayData = <?= json_encode($totalYesterday) ?>;
 
-    var options = {
-        chart: {
-            type: 'bar',
-            height: 560
-        },
-        series: [{
-                name: 'Yesterday',
-                data: yesterdayData
-            },
-            {
-                name: 'Today',
-                data: todayData
-            }
-        ],
-        xaxis: {
-            categories: lines,
-            title: {
-                text: 'Line'
-            }
-        },
-        yaxis: {
-            title: {
-                text: 'Output Qty'
-            }
-        },
-        colors: ['#008FFB', '#00fba3'],
-        plotOptions: {
-            bar: {
-                horizontal: false
-            }
+var options = {
+    chart: {
+        type: 'bar',
+        height: 450
+    },
+    series: [{
+        name: 'Output Qty',
+        data: [yesterdayData, todayData]
+    }],
+    xaxis: {
+        categories: ['Yesterday', 'Today']
+    },
+    colors: ['#009ffb', '#00fba3'],
+    dataLabels: { enabled: true },
+    plotOptions: {
+        bar: {
+            columnWidth: '40%',
+            distributed: true
         }
-    };
+    }
+};
 
-    var chart = new ApexCharts(document.querySelector("#todayChart"), options);
-    chart.render();
+
+
+var chart = new ApexCharts(document.querySelector("#todayChart"), options);
+chart.render();
+
 
 function fetchDataAndUpdate(){
-    fetch('get_outputqc_data.php')
+    fetch('get_outputcut_data.php')
     .then(res => res.json())
     .then(data => {
 
-        const today = data.today;
-        const yesterday = data.yesterday;
+        const today = parseInt(data.today);
+        const yesterday = parseInt(data.yesterday);
 
-        const allLines = Array.from(new Set([
-            ...Object.keys(today),
-            ...Object.keys(yesterday)
-        ])).sort();
+        chart.updateSeries([{
+            name: 'Output Qty',
+            data: [yesterday, today]
+        }]);
 
-        const todayArr = allLines.map(l => today[l] ?? 0);
-        const yesterdayArr = allLines.map(l => yesterday[l] ?? 0);
-
-        // 🔄 UPDATE CHART
-        chart.updateOptions({
-            xaxis: { categories: allLines }
-        });
-        chart.updateSeries([
-            { name: 'Yesterday', data: yesterdayArr },
-            { name: 'Today', data: todayArr }
-        ]);
-
-        // 🔄 UPDATE TABLE
         const table = $('#outputTable').DataTable();
-        table.clear();
-
-        allLines.forEach((line, i) => {
-            table.row.add([
-                i+1,
-                line,
-                yesterday[line] ?? 0,
-                today[line] ?? 0
-            ]);
-        });
-
-        table.draw(false);
+        table.clear().row.add([
+            1,
+            yesterday,
+            today
+        ]).draw(false);
     });
 }
+
+
 
 // jalan pertama
 fetchDataAndUpdate();
 
-// refresh tiap 10 detik
+// refresh tiap 30 detik
 setInterval(fetchDataAndUpdate, 30000);
 
     // Fungsi untuk memperbarui waktu secara dinamis
