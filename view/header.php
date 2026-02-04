@@ -261,6 +261,7 @@
                   <li style="background: #254681"><a style="background: #254681" href="reminder_qc_endline_target.php?lantai=1">REMINDER TARGET LT.1</a></li>
                   <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_qcendline.php">CHART QC ENDLINE ALL LINE</a></li>
                   <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_cutting.php">CHART CUTTING</a></li>
+                  <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_trimstore.php">CHART TRIMSTORE</a></li>
                 </ul>
               </li>
               <li style="background: #254681"><a style="background: #254681" href="#">PREPARATION PRODUCTION</a>

@@ -259,13 +259,19 @@ foreach(array_keys($lines) as $line){
             <div id="day-date"></div>
             <div id="time"></div>
         </div>
-        <div class="marquee-section">
-            <lottie-player src="assets/images/animation.json" speed="1" style="width: 100px; height: 70px" loop autoplay
+        <div class="marquee-text">PT. GLOBALINDO INTIMATES | THANKS FOR YOUR WORK | TERIMAKASIH ATAS KERJA KERAS ANDA</div>
+            <div class="row">
+                <div class="col-md-6">
+ <lottie-player src="assets/images/animation.json" speed="1" style="width: 100px; height: 70px" loop autoplay
                 direction="1" mode="normal" class="anim mx-auto">
             </lottie-player>
-
-            <div class="marquee-text">PT. GLOBALINDO INTIMATES | THANKS FOR YOUR WORK | TERIMAKASIH ATAS KERJA KERAS ANDA</div>
-
+                </div>
+                <div class="col-md-6">
+<lottie-player src="assets/images/fish.json" speed="1" style="width: 100px; height: 70px" loop autoplay
+                direction="1" mode="normal" class="anim mx-auto">
+            </lottie-player>
+                </div>
+            </div>
         </div>
 
     </footer>

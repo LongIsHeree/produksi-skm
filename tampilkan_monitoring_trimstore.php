@@ -6,7 +6,7 @@ function getTotalToday($tgl){
     global $koneksi;
     $q = mysqli_query($koneksi,"
         SELECT COALESCE(SUM(qty),0) AS total
-        FROM transaksi_cutting
+        FROM transaksi_trimstore
         WHERE tanggal = '$tgl'
     ");
     return mysqli_fetch_assoc($q)['total'] ?? 0;
@@ -20,7 +20,7 @@ function getTotalYesterday($tgl){
 
     $q = mysqli_query($koneksi,"
         SELECT COALESCE(SUM(qty),0) AS total
-        FROM transaksi_cutting
+        FROM transaksi_trimstore
         WHERE tanggal = '$yesterday'
     ");
     return mysqli_fetch_assoc($q)['total'] ?? 0;
@@ -168,7 +168,7 @@ $totalYesterday = getTotalYesterday($tgl);
                     <div class="col-md-5">
                         <div class="card shadow mb-4">
                             <div class="card-body">
-                                <h2><i class="fas fa-bullhorn"></i> CUTTING TODAY & YESTERDAY OUTPUT</h2>
+                                <h2><i class="fas fa-bullhorn"></i> TRIMSTORE TODAY & YESTERDAY OUTPUT</h2>
                                 <br>
                                 <table id="outputTable" class="table-striped table-hover">
                                     <thead>
@@ -304,7 +304,7 @@ chart.render();
 
 
 function fetchDataAndUpdate(){
-    fetch('get_outputcut_data.php')
+    fetch('get_outputtrim_data.php')
     .then(res => res.json())
     .then(data => {
 
