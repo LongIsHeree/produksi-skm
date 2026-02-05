@@ -10,9 +10,16 @@
 
 /* Gaya tabel dasar */
 table {
-    width: 100%;
+    width: auto;
     border-collapse: collapse;
     border: 1px solid #ffffff;
+    
+}
+#outputTable thead th {
+    background-color: #ff0000 !important;
+    color: #ffffff !important;
+    text-align: center;
+    font-weight: bold;
 }
 
 /* Gaya sel tabel */

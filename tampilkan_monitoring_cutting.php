@@ -41,11 +41,11 @@ $totalYesterday = getTotalYesterday($tgl);
     <meta charset="UTF-8">
     <link rel="icon" type="image/ico" href="favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/css/style.css">
+   
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
-
+ <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>SEWING MONITORING</title>
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
@@ -170,16 +170,17 @@ $totalYesterday = getTotalYesterday($tgl);
                             <div class="card-body">
                                 <h2><i class="fas fa-bullhorn"></i> CUTTING TODAY & YESTERDAY OUTPUT</h2>
                                 <br>
-                               <table id="outputTable" class="table-striped table-hover">
+                               <table id="outputTable" class="table table-striped table-hover table-bordered nowrap w-100">
+
 <thead>
 <tr>
-<th style="text-align: center;">NO</th>
-<th style="text-align: center;">LINE</th>
-<th style="text-align: center;">ORC</th>
-<th style="text-align: center;">ORDER</th>
-<th style="text-align: center;">YDA</th>
-<th style="text-align: center;">DAILY</th>
-<th style="text-align: center;">BAL</th>
+<th >NO</th>
+<th >LINE</th>
+<th >ORC</th>
+<th >ORDER</th>
+<th >YDA</th>
+<th >DAILY</th>
+<th >BAL</th>
 
 </tr>
 </thead>
@@ -236,12 +237,13 @@ $(document).ready(function() {
         lengthMenu: [10, 25, 50, 100],
         order: [[5, 'asc']], 
         columnDefs: [
-            { width: "10px", targets: 0, className:"text-center"},   // NO
-            { width: "60px", targets: 1, className:"text-center" },   // LINE
-            { width: "200px", targets: 2, className:"text-center" },  // ORC
-            { width: "30px", targets: 3, className: "text-center" }, // YESTERDAY
-            { width: "30px", targets: 4, className: "text-center" }, // TODAY
-            { width: "30px", targets: 5, className: "text-center" }  // BALANCING
+            { width: "10%", targets: 0, className:"text-center"},   // NO
+            { width: "20%", targets: 1, className:"text-center" },   // LINE
+            { width: "40%", targets: 2, className:"text-center" },  // ORC
+            { width: "20%", targets: 3, className: "text-center" }, // ORDER
+            { width: "10%", targets: 4, className: "text-center" }, // YERTERDAY
+            { width: "10%", targets: 5, className: "text-center" },// TODAY
+            { width: "10%", targets: 6, className: "text-center" }  // BALANCING  
         ],
         language: {
             search: "Cari:",
