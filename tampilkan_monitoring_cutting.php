@@ -176,9 +176,9 @@ $totalYesterday = getTotalYesterday($tgl);
 <th style="text-align: center;">NO</th>
 <th style="text-align: center;">LINE</th>
 <th style="text-align: center;">ORC</th>
-<th style="text-align: center;">OUTPUT YESTERDAY</th>
-<th style="text-align: center;">OUTPUT TODAY</th>
-<th style="text-align: center;">BALANCING</th>
+<th style="text-align: center;">YESTERDAY</th>
+<th style="text-align: center;">TODAY</th>
+<th style="text-align: center;">BALANCE</th>
 
 </tr>
 </thead>
