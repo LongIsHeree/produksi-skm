@@ -217,9 +217,6 @@ $no = 1;
             <div id="time"></div>
         </div>
         <div class="marquee-section">
-           
-            
-
             <div class="marquee-text">PT. GLOBALINDO INTIMATES | THANKS FOR YOUR WORK | TERIMAKASIH ATAS KERJA KERAS ANDA</div>
             <div class="lottie-wrapper" style="flex:auto;">
     <lottie-player src="assets/images/animation.json" speed="1"

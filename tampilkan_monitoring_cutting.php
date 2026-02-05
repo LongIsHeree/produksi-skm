@@ -1,7 +1,7 @@
 <?php
 require_once 'core/init.php';
 
-date_default_timezone_set('Asia/Jakarta'); // penting
+date_default_timezone_set('Asia/Jakarta');
 function getTotalToday($tgl){
     global $koneksi;
     $q = mysqli_query($koneksi,"
@@ -170,37 +170,21 @@ $totalYesterday = getTotalYesterday($tgl);
                             <div class="card-body">
                                 <h2><i class="fas fa-bullhorn"></i> CUTTING TODAY & YESTERDAY OUTPUT</h2>
                                 <br>
-                                <table id="outputTable" class="table-striped table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <center>NO</center>
-                                            </th>
-                                            <th>
-                                                <center>Output Yesterday</center>
-                                            </th>
-                                            <th>
-                                                <center>Output Today</center>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-$no = 1;
+                               <table id="outputTable" class="table-striped table-hover">
+<thead>
+<tr>
+<th style="text-align: center;">NO</th>
+<th style="text-align: center;">LINE</th>
+<th style="text-align: center;">ORC</th>
+<th style="text-align: center;">OUTPUT YESTERDAY</th>
+<th style="text-align: center;">OUTPUT TODAY</th>
+<th style="text-align: center;">BALANCING</th>
 
-?>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
 
-                                        <tr>
-                                            <td>
-                                                <center><?= $no++ ?></center>
-                                            </td>
-                                            <td><center><?= $totalYesterday ?></center></td>
-                                            <td><center><?= $totalToday ?></center></td>
-                                        </tr>
-                                     
-                                    </tbody>
-
-                                </table>
                             </div>
                         </div>
                     </div>
@@ -217,9 +201,6 @@ $no = 1;
             <div id="time"></div>
         </div>
         <div class="marquee-section">
-           
-            
-
             <div class="marquee-text">PT. GLOBALINDO INTIMATES | THANKS FOR YOUR WORK | TERIMAKASIH ATAS KERJA KERAS ANDA</div>
             <div class="lottie-wrapper" style="flex:auto;">
     <lottie-player src="assets/images/animation.json" speed="1"
@@ -231,6 +212,7 @@ $no = 1;
         </div>
 
     </footer>
+
 
     <?php
 
@@ -245,137 +227,153 @@ $no = 1;
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
-    <script>
-    $(document).ready(function() {
-        $('#outputTable').DataTable({
-            responsive: true,
-            pageLength: 10,
-            lengthMenu: [10, 25, 50, 100],
-            order: [
-                [1, 'asc']
-            ], // sort berdasarkan line
-            columnDefs: [{
-                className: "text-center",
-                targets: "_all"
-            }],
-            language: {
-                search: "Cari:",
-                lengthMenu: "Tampilkan _MENU_ data",
-                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                paginate: {
-                    first: "Awal",
-                    last: "Akhir",
-                    next: "→",
-                    previous: "←"
-                },
-                zeroRecords: "Tidak ada data ditemukan"
-            }
-        });
+   <script>
+$(document).ready(function() {
+    $('#outputTable').DataTable({
+        responsive: true,
+        pageLength: 10,
+        lengthMenu: [10, 25, 50, 100],
+        order: [[4, 'asc']], 
+        columnDefs: [
+            { width: "10px", targets: 0, className:"text-center"},   // NO
+            { width: "60px", targets: 1, className:"text-center" },   // LINE
+            { width: "200px", targets: 2, className:"text-center" },  // ORC
+            { width: "30px", targets: 3, className: "text-center" }, // YESTERDAY
+            { width: "30px", targets: 4, className: "text-center" }, // TODAY
+            { width: "30px", targets: 5, className: "text-center" }  // BALANCING
+        ],
+        language: {
+            search: "Cari:",
+            lengthMenu: "Tampilkan _MENU_ data",
+            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+            paginate: {
+                first: "Awal",
+                last: "Akhir",
+                next: "→",
+                previous: "←"
+            },
+            zeroRecords: "Tidak ada data ditemukan"
+        }
     });
-    const todayData = <?= json_encode($totalToday) ?>;
-    const yesterdayData = <?= json_encode($totalYesterday) ?>;
+});
 
 var options = {
-    chart: {
-        type: 'bar',
-        height: 450
-    },
-    series: [{
-        name: 'Output Qty',
-        data: [yesterdayData, todayData]
-    }],
-    xaxis: {
-        categories: ['Yesterday', 'Today']
-    },
-    colors: ['#009ffb', '#00fba3'],
-    dataLabels: { enabled: true },
-    plotOptions: {
-        bar: {
-            columnWidth: '40%',
-            distributed: true
-        }
-    }
+    chart:{ type:'bar', height:450, },
+    series:[
+        { name:'Yesterday', data:[] },
+        { name:'Today', data:[] }
+    ],
+    xaxis:{ categories:[] },
+    colors:['#009ffb','#00fba3'],
+    dataLabels:{ enabled:true,style: {
+    colors: ['#000000'] 
+  } },
+    plotOptions:{ bar:{ columnWidth:'50%' } }
 };
-
-
 
 var chart = new ApexCharts(document.querySelector("#todayChart"), options);
 chart.render();
 
-
-function fetchDataAndUpdate(){
-    fetch('get_outputcut_data.php')
-    .then(res => res.json())
-    .then(data => {
-
-        const today = parseInt(data.today);
-        const yesterday = parseInt(data.yesterday);
-
-        chart.updateSeries([{
-            name: 'Output Qty',
-            data: [yesterday, today]
-        }]);
-
-        const table = $('#outputTable').DataTable();
-        table.clear().row.add([
-            1,
-            yesterday,
-            today
-        ]).draw(false);
+function sumByLine(arr){
+    const map = {};
+    arr.forEach(d => {
+        map[d.line] = (map[d.line] || 0) + d.qty;
     });
+    return map;
 }
 
+function fetchDataAndUpdate(){
+    const params = new URLSearchParams({
+        tgl: '<?= $tgl ?>',
+        status: 'OPEN',
+        orc: '',
+        style: '',
+        line: 'all'
+    });
 
+    fetch('get_outputcut_data.php?' + params.toString())
+    .then(res => res.json())
+    .then(data => {
+        console.log('Data received:', data);
 
-// jalan pertama
+      
+        const today = (data.today || []).filter(d => d.qty > 0);
+        const yesterday = data.yesterday || [];
+        const balanceMap = data.balance_map || {};
+        const yesterdayMap = data.yesterday_map || {};
+
+        // CHART aggregated per LINE
+        const todayLine = sumByLine(today);
+        const yLine = sumByLine(yesterday);
+        
+       
+        const lines = Object.keys(todayLine).sort();
+
+        chart.updateOptions({ xaxis: { categories: lines } });
+        chart.updateSeries([
+            { name: 'Yesterday', data: lines.map(l => yLine[l] || 0) },
+            { name: 'Today', data: lines.map(l => todayLine[l] || 0) }
+        ]);
+
+       
+        const table = $('#outputTable').DataTable();
+        table.clear();
+        const sortedToday = today.sort((a, b) => a.qty - b.qty);
+
+        sortedToday.forEach((d, i) => {
+            const key = d.line + '|' + d.orc;
+            const bal = balanceMap[d.orc] || 0;
+            table.row.add([
+                i + 1,
+                d.line,
+                d.orc,
+                yesterdayMap[key] || 0,
+                d.qty,
+                bal
+            ]);
+        });
+
+        table.draw(false);
+    })
+    .catch(err => console.error('Error fetching data:', err));
+}
+
+// Panggil pertama kali
 fetchDataAndUpdate();
 
-// refresh tiap 30 detik
+// Auto refresh setiap 30 detik
 setInterval(fetchDataAndUpdate, 30000);
 
-    // Fungsi untuk memperbarui waktu secara dinamis
-    function updateTime() {
-        const now = new Date();
-        const options = {
-            timeZone: 'Asia/Jakarta',
-            hour12: false
-        };
-        let timeString = now.toLocaleTimeString('id-ID', options);
-        // Mengubah pemisah titik (.) menjadi titik dua (:)
-        timeString = timeString.replace(/\./g, ':');
-        document.getElementById('time').innerText = timeString;
-    }
+// Fungsi untuk memperbarui waktu secara dinamis
+function updateTime() {
+    const now = new Date();
+    const options = {
+        timeZone: 'Asia/Jakarta',
+        hour12: false
+    };
+    let timeString = now.toLocaleTimeString('id-ID', options);
+    timeString = timeString.replace(/\./g, ':');
+    document.getElementById('time').innerText = timeString;
+}
 
-    // Set interval untuk memperbarui waktu setiap detik
-    setInterval(updateTime, 1000);
+setInterval(updateTime, 1000);
 
-    // Menampilkan hari, tanggal, bulan, dan tahun secara dinamis
-    function updateDate() {
-        const now = new Date();
-        const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September",
-            "Oktober", "November", "Desember"
-        ];
-        const dayName = days[now.getDay()];
-        const date = now.getDate();
-        const monthName = months[now.getMonth()];
-        const year = now.getFullYear();
-        document.getElementById('day-date').innerText = `${dayName}, ${date} ${monthName} ${year}`;
-    }
+// Menampilkan hari, tanggal, bulan, dan tahun secara dinamis
+function updateDate() {
+    const now = new Date();
+    const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September",
+        "Oktober", "November", "Desember"
+    ];
+    const dayName = days[now.getDay()];
+    const date = now.getDate();
+    const monthName = months[now.getMonth()];
+    const year = now.getFullYear();
+    document.getElementById('day-date').innerText = `${dayName}, ${date} ${monthName} ${year}`;
+}
 
-    updateDate(); // Panggil fungsi untuk memperbarui tanggal
-
-    // Slider otomatis
-    let currentIndex = 0;
-    const images = document.querySelectorAll('.image-slider img');
-    const totalImages = images.length;
-
-    function showNextImage() {
-        images[currentIndex].classList.remove('active');
-        currentIndex = (currentIndex + 1) % totalImages;
-        images[currentIndex].classList.add('active');
-    }
-    </script>
+updateDate();
+</script>
 </body>
 
 </html>

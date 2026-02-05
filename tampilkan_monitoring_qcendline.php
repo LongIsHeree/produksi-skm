@@ -118,7 +118,13 @@ $yesterday = fetch_assoc_all(get_output_qcChart_endline_yesterday($tgl));
         overflow: hidden;
         border-top: 1px solid rgba(0, 255, 255, 0.2);
     }
-
+.lottie-wrapper {
+    display: flex;
+    justify-content: center;  /* center horizontal */
+    align-items: center;      /* center vertical */
+    gap: 40px;                /* jarak antar animasi */
+    margin-top: 10px;
+}
     .main-footer .marquee-text {
         text-shadow: 0 0 5px #00f7ff, 0 0 10px #00f7ff;
     }
@@ -259,19 +265,15 @@ foreach(array_keys($lines) as $line){
             <div id="day-date"></div>
             <div id="time"></div>
         </div>
-        <div class="marquee-text">PT. GLOBALINDO INTIMATES | THANKS FOR YOUR WORK | TERIMAKASIH ATAS KERJA KERAS ANDA</div>
-            <div class="row">
-                <div class="col-md-6">
- <lottie-player src="assets/images/animation.json" speed="1" style="width: 100px; height: 70px" loop autoplay
-                direction="1" mode="normal" class="anim mx-auto">
-            </lottie-player>
-                </div>
-                <div class="col-md-6">
-<lottie-player src="assets/images/fish.json" speed="1" style="width: 100px; height: 70px" loop autoplay
-                direction="1" mode="normal" class="anim mx-auto">
-            </lottie-player>
-                </div>
-            </div>
+       <div class="marquee-section">
+            <div class="marquee-text">PT. GLOBALINDO INTIMATES | THANKS FOR YOUR WORK | TERIMAKASIH ATAS KERJA KERAS ANDA</div>
+            <div class="lottie-wrapper" style="flex:auto;">
+    <lottie-player src="assets/images/animation.json" speed="1"
+        style="width:100px;height:70px" loop autoplay></lottie-player>
+
+    <lottie-player src="assets/images/fish.json" speed="1"
+        style="width:100px;height:70px" loop autoplay></lottie-player>
+</div>
         </div>
 
     </footer>
