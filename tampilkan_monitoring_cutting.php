@@ -176,9 +176,10 @@ $totalYesterday = getTotalYesterday($tgl);
 <th style="text-align: center;">NO</th>
 <th style="text-align: center;">LINE</th>
 <th style="text-align: center;">ORC</th>
-<th style="text-align: center;">YESTERDAY</th>
-<th style="text-align: center;">TODAY</th>
-<th style="text-align: center;">BALANCE</th>
+<th style="text-align: center;">ORDER</th>
+<th style="text-align: center;">YDA</th>
+<th style="text-align: center;">DAILY</th>
+<th style="text-align: center;">BAL</th>
 
 </tr>
 </thead>
@@ -233,7 +234,7 @@ $(document).ready(function() {
         responsive: true,
         pageLength: 10,
         lengthMenu: [10, 25, 50, 100],
-        order: [[4, 'asc']], 
+        order: [[5, 'asc']], 
         columnDefs: [
             { width: "10px", targets: 0, className:"text-center"},   // NO
             { width: "60px", targets: 1, className:"text-center" },   // LINE
@@ -323,13 +324,16 @@ function fetchDataAndUpdate(){
         sortedToday.forEach((d, i) => {
             const key = d.line + '|' + d.orc;
             const bal = balanceMap[d.orc] || 0;
+            
             table.row.add([
                 i + 1,
                 d.line,
                 d.orc,
+                d.qty_order,
                 yesterdayMap[key] || 0,
                 d.qty,
-                bal
+                bal,
+                
             ]);
         });
 
