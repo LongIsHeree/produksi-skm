@@ -1,54 +1,34 @@
 <?php
 require_once 'core/init.php';
 
-date_default_timezone_set('Asia/Jakarta'); // penting
-function get_output_qcChart_endline_yesterday($tgl){
+date_default_timezone_set('Asia/Jakarta');
+function getTotalToday($tgl){
     global $koneksi;
+    $q = mysqli_query($koneksi,"
+        SELECT COALESCE(SUM(qty),0) AS total
+        FROM transaksi_qc_endline
+        WHERE tanggal = '$tgl'
+    ");
+    return mysqli_fetch_assoc($q)['total'] ?? 0;
+}
 
+function getTotalYesterday($tgl){
+    global $koneksi;
     $date = new DateTime($tgl);
     $date->modify('-1 day');
     $yesterday = $date->format('Y-m-d');
 
-    $query = "SELECT 
-                line,
-                SUM(qty) AS Output_Yesterday
-              FROM transaksi_qc_endline
-              WHERE tanggal = '$yesterday'
-              GROUP BY line
-              ORDER BY line";
-    return mysqli_query($koneksi, $query);
-}
-
-function get_output_qcChart_endline($tgl){
-      global $koneksi;
-
-    $query = "SELECT 
-                line, 
-                SUM(qty) AS Output_Today
-              FROM transaksi_qc_endline
-              WHERE tanggal = '$tgl'
-              GROUP BY line
-              ORDER BY line";
-
-    return mysqli_query($koneksi, $query);
-}
-
-function fetch_assoc_all($result){
-    $rows = [];
-    while($r = mysqli_fetch_assoc($result)){
-        $rows[] = $r;
-    }
-    return $rows;
+    $q = mysqli_query($koneksi,"
+        SELECT COALESCE(SUM(qty),0) AS total
+        FROM transaksi_qc_endline
+        WHERE tanggal = '$yesterday'
+    ");
+    return mysqli_fetch_assoc($q)['total'] ?? 0;
 }
 
 $tgl = date('Y-m-d');
-
-
-// echo $tgl;
-// die();
-$today = fetch_assoc_all(get_output_qcChart_endline($tgl));
-$yesterday = fetch_assoc_all(get_output_qcChart_endline_yesterday($tgl));
-
+$totalToday = getTotalToday($tgl);
+$totalYesterday = getTotalYesterday($tgl);
 
 ?>
 
@@ -59,15 +39,16 @@ $yesterday = fetch_assoc_all(get_output_qcChart_endline_yesterday($tgl));
     <meta charset="UTF-8">
     <link rel="icon" type="image/ico" href="favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/css/style.css">
+   
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
-
+ <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>SEWING MONITORING</title>
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <style>
+ 
     .main-header {
         position: relative;
         background: #0a0f1c;
@@ -78,6 +59,13 @@ $yesterday = fetch_assoc_all(get_output_qcChart_endline_yesterday($tgl));
         padding-right: 40px;
         overflow: hidden;
     }
+.lottie-wrapper {
+    display: flex;
+    justify-content: center;  /* center horizontal */
+    align-items: center;      /* center vertical */
+    gap: 40px;                /* jarak antar animasi */
+    margin-top: 10px;
+}
 
     /* Garis neon jalan */
     .header-line {
@@ -101,6 +89,40 @@ $yesterday = fetch_assoc_all(get_output_qcChart_endline_yesterday($tgl));
         }
     }
 
+.dataTables_wrapper .dataTables_scrollBody {
+    border: 1px solid #ddd;
+}
+
+
+.dataTables_wrapper {
+    position: relative;
+}
+
+.dataTables_wrapper::before {
+    content: '';
+    position: absolute;
+    top: 50px; /* Setelah header */
+    left: 0;
+    right: 17px; /* Space untuk scrollbar */
+    height: 30px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.9), transparent);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.dataTables_wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 17px;
+    height: 30px;
+    background: linear-gradient(to top, rgba(255,255,255,0.9), transparent);
+    z-index: 10;
+    pointer-events: none;
+}
+
+
     /* Glow logo & lottie */
     .main-header img {
         filter: drop-shadow(0 0 6px #00f7ff);
@@ -118,13 +140,7 @@ $yesterday = fetch_assoc_all(get_output_qcChart_endline_yesterday($tgl));
         overflow: hidden;
         border-top: 1px solid rgba(0, 255, 255, 0.2);
     }
-.lottie-wrapper {
-    display: flex;
-    justify-content: center;  /* center horizontal */
-    align-items: center;      /* center vertical */
-    gap: 40px;                /* jarak antar animasi */
-    margin-top: 10px;
-}
+
     .main-footer .marquee-text {
         text-shadow: 0 0 5px #00f7ff, 0 0 10px #00f7ff;
     }
@@ -174,7 +190,7 @@ $yesterday = fetch_assoc_all(get_output_qcChart_endline_yesterday($tgl));
                                 <div class="row">
                                     <div class="col">
                                         <h3>
-                                            <center><strong>Output Today </strong></center>
+                                            <center><strong>TODAY & YESTERDAY OUTPUT CHART </strong></center>
                                         </h3>
                                         <div id="todayChart"></div>
                                     </div>
@@ -185,71 +201,26 @@ $yesterday = fetch_assoc_all(get_output_qcChart_endline_yesterday($tgl));
                     <div class="col-md-5">
                         <div class="card shadow mb-4">
                             <div class="card-body">
-                                <h2><i class="fas fa-bullhorn"></i> QC ENDLINE OUTPUT</h2>
+                                <h2><i class="fas fa-bullhorn"></i> QC ENDLINE TODAY & YESTERDAY OUTPUT</h2>
                                 <br>
-                                <table id="outputTable" class="table-striped table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <center>NO</center>
-                                            </th>
-                                            <th>
-                                                <center>Line</center>
-                                            </th>
-                                            <th>
-                                                <center>Sewing Yesterday</center>
-                                            </th>
-                                            <th>
-                                                <center>Sewing Today</center>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-$no = 1;
-$lines = [];
+                            
+                               <table id="outputTable" class="table table-striped table-hover table-bordered nowrap w-100">
 
-// Gabungkan semua line unik
-foreach($today as $t) $lines[$t['line']] = true;
-foreach($yesterday as $y) $lines[$y['line']] = true;
+<thead>
+<tr>
+<th >NO</th>
+<th >LINE</th>
+<th >ORC</th>
+<th >ORDER</th>
+<th >YDA</th>
+<th >DAILY</th>
+<th >BAL</th>
 
-foreach(array_keys($lines) as $line){
-
-    $today_qty = 0;
-    foreach($today as $t){
-        if($t['line'] == $line){
-            $today_qty = $t['Output_Today'];
-            break;
-        }
-    }
-
-    $y_qty = 0;
-    foreach($yesterday as $y){
-        if($y['line'] == $line){
-            $y_qty = $y['Output_Yesterday'];
-            break;
-        }
-    }
-?>
-
-                                        <tr>
-                                            <td>
-                                                <center><?= $no++ ?></center>
-                                            </td>
-                                            <td>
-                                                <center><?= $line ?></center>
-                                            </td>
-                                            <td>
-                                                <center><?= $y_qty ?></center>
-                                            </td>
-                                            <td>
-                                                <center><?= $today_qty ?></center>
-                                            </td>
-                                        </tr>
-                                        <?php } ?>
-                                    </tbody>
-
-                                </table>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+                   
                             </div>
                         </div>
                     </div>
@@ -265,7 +236,7 @@ foreach(array_keys($lines) as $line){
             <div id="day-date"></div>
             <div id="time"></div>
         </div>
-       <div class="marquee-section">
+        <div class="marquee-section">
             <div class="marquee-text">PT. GLOBALINDO INTIMATES | THANKS FOR YOUR WORK | TERIMAKASIH ATAS KERJA KERAS ANDA</div>
             <div class="lottie-wrapper" style="flex:auto;">
     <lottie-player src="assets/images/animation.json" speed="1"
@@ -278,28 +249,13 @@ foreach(array_keys($lines) as $line){
 
     </footer>
 
+
     <?php
-$chart_lines = [];
-$chart_today = [];
-$chart_yesterday = [];
 
-$mapToday = [];
-foreach($today as $t) $mapToday[$t['line']] = (int)$t['Output_Today'];
 
-$mapYesterday = [];
-foreach($yesterday as $y) $mapYesterday[$y['line']] = (int)$y['Output_Yesterday'];
 
-$allLines = array_unique(array_merge(array_keys($mapToday), array_keys($mapYesterday)));
-sort($allLines);
 
-foreach($allLines as $l){
-    $chart_lines[] = $l;
-    $chart_today[] = $mapToday[$l] ?? 0;
-    $chart_yesterday[] = $mapYesterday[$l] ?? 0;
-}
 ?>
-
-
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -307,164 +263,190 @@ foreach($allLines as $l){
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
-    <script>
-    $(document).ready(function() {
+   <script>
+$(document).ready(function() {
         $('#outputTable').DataTable({
-            responsive: true,
-            pageLength: 10,
-            lengthMenu: [10, 25, 50, 100],
-            order: [
-                [1, 'asc']
-            ], // sort berdasarkan line
-            columnDefs: [{
-                className: "text-center",
-                targets: "_all"
-            }],
-            language: {
-                search: "Cari:",
-                lengthMenu: "Tampilkan _MENU_ data",
-                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                paginate: {
-                    first: "Awal",
-                    last: "Akhir",
-                    next: "→",
-                    previous: "←"
-                },
-                zeroRecords: "Tidak ada data ditemukan"
-            }
-        });
+        responsive: false, 
+        paging: false,     
+        searching: false,  
+        info: false,      
+        scrollY: '450px',  
+        scrollCollapse: true,
+        order: [[5, 'asc']], // Sort by DAILY ascending
+        columnDefs: [
+            { width: "5%", targets: 0, className:"text-center"},   // NO
+            { width: "15%", targets: 1, className:"text-center" },  // LINE
+            { width: "30%", targets: 2, className:"text-center" },  // ORC
+            { width: "15%", targets: 3, className: "text-center" }, // ORDER
+            { width: "10%", targets: 4, className: "text-center" }, // YESTERDAY
+            { width: "15%", targets: 5, className: "text-center" }, // TODAY
+            { width: "10%", targets: 6, className: "text-center" }  // BALANCING  
+        ]
     });
-    const lines = <?= json_encode($chart_lines) ?>;
-    const todayData = <?= json_encode($chart_today) ?>;
-    const yesterdayData = <?= json_encode($chart_yesterday) ?>;
+});
 
-    var options = {
-        chart: {
-            type: 'bar',
-            height: 560
-        },
-        series: [{
-                name: 'Yesterday',
-                data: yesterdayData
-            },
-            {
-                name: 'Today',
-                data: todayData
-            }
-        ],
-        xaxis: {
-            categories: lines,
-            title: {
-                text: 'Line'
-            }
-        },
-        yaxis: {
-            title: {
-                text: 'Output Qty'
-            }
-        },
-        colors: ['#008FFB', '#00fba3'],
-        plotOptions: {
-            bar: {
-                horizontal: false
-            }
-        }
-    };
+var options = {
+    chart:{ type:'bar', height:515, },
+    series:[
+        { name:'Yesterday', data:[] },
+        { name:'Today', data:[] }
+    ],
+    xaxis:{ categories:[] },
+    colors:['#009ffb','#00fba3'],
+    dataLabels:{ enabled:true,style: {
+    colors: ['#000000'] 
+  } },
+    plotOptions:{ bar:{ columnWidth:'50%' } }
+};
 
-    var chart = new ApexCharts(document.querySelector("#todayChart"), options);
-    chart.render();
+var chart = new ApexCharts(document.querySelector("#todayChart"), options);
+chart.render();
+
+function sumByLine(arr){
+    const map = {};
+    arr.forEach(d => {
+        map[d.line] = (map[d.line] || 0) + d.qty;
+    });
+    return map;
+}
 
 function fetchDataAndUpdate(){
-    fetch('get_outputqc_data.php')
+    const params = new URLSearchParams({
+        tgl: '<?= $tgl ?>',
+        status: 'OPEN',
+        orc: '',
+        style: '',
+        line: 'all'
+    });
+
+    fetch('get_outputqc_data.php?' + params.toString())
     .then(res => res.json())
     .then(data => {
+        console.log('Data received:', data);
 
-        const today = data.today;
-        const yesterday = data.yesterday;
+      
+        const today = (data.today || []).filter(d => d.qty > 0);
+        const yesterday = data.yesterday || [];
+        const balanceMap = data.balance_map || {};
+        const yesterdayMap = data.yesterday_map || {};
 
-        const allLines = Array.from(new Set([
-            ...Object.keys(today),
-            ...Object.keys(yesterday)
-        ])).sort();
+        // CHART aggregated per LINE
+        const todayLine = sumByLine(today);
+        const yLine = sumByLine(yesterday);
+        
+       
+        const lines = Object.keys(todayLine).sort();
 
-        const todayArr = allLines.map(l => today[l] ?? 0);
-        const yesterdayArr = allLines.map(l => yesterday[l] ?? 0);
-
-        // 🔄 UPDATE CHART
-        chart.updateOptions({
-            xaxis: { categories: allLines }
-        });
+        chart.updateOptions({ xaxis: { categories: lines } });
         chart.updateSeries([
-            { name: 'Yesterday', data: yesterdayArr },
-            { name: 'Today', data: todayArr }
+            { name: 'Yesterday', data: lines.map(l => yLine[l] || 0) },
+            { name: 'Today', data: lines.map(l => todayLine[l] || 0) }
         ]);
 
-        // 🔄 UPDATE TABLE
+       
         const table = $('#outputTable').DataTable();
         table.clear();
+        const sortedToday = today.sort((a, b) => a.qty - b.qty);
 
-        allLines.forEach((line, i) => {
+        sortedToday.forEach((d, i) => {
+            const key = d.line + '|' + d.orc;
+            const bal = balanceMap[d.orc] || 0;
+            
             table.row.add([
-                i+1,
-                line,
-                yesterday[line] ?? 0,
-                today[line] ?? 0
+                i + 1,
+                d.line,
+                d.orc,
+                d.qty_order,
+                yesterdayMap[key] || 0,
+                d.qty,
+                bal,
+                
             ]);
         });
 
         table.draw(false);
-    });
+    })
+    .catch(err => console.error('Error fetching data:', err));
 }
 
-// jalan pertama
+// Panggil pertama kali
 fetchDataAndUpdate();
 
-// refresh tiap 10 detik
+// Auto refresh setiap 30 detik
 setInterval(fetchDataAndUpdate, 30000);
 
-    // Fungsi untuk memperbarui waktu secara dinamis
-    function updateTime() {
-        const now = new Date();
-        const options = {
-            timeZone: 'Asia/Jakarta',
-            hour12: false
-        };
-        let timeString = now.toLocaleTimeString('id-ID', options);
-        // Mengubah pemisah titik (.) menjadi titik dua (:)
-        timeString = timeString.replace(/\./g, ':');
-        document.getElementById('time').innerText = timeString;
-    }
+// Auto scroll tabel - PERBAIKAN
+function initAutoScroll() {
+    let scrollPosition = 0;
+    let scrollSpeed = 1; // Kecepatan scroll (pixel per frame)
+    let isPaused = false;
+    
+    setInterval(function() {
+        if (isPaused) return;
+        
+       
+        const scrollBody = document.querySelector('.dataTables_scrollBody');
+        
+        if (!scrollBody) {
+            console.log('ScrollBody not found'); // Debug
+            return;
+        }
+        
+        scrollPosition += scrollSpeed;
+        
+        // Reset ke atas jika sudah sampai bawah
+        if (scrollPosition >= scrollBody.scrollHeight - scrollBody.clientHeight) {
+            scrollPosition = 0;
+        }
+        
+        scrollBody.scrollTop = scrollPosition;
+    }, 50); // Scroll setiap 50ms
+    
+    // Pause on hover
+    $('#outputTable').hover(
+        function() { 
+            isPaused = true; 
+            console.log('Paused'); // Debug
+        },
+        function() { 
+            isPaused = false; 
+            console.log('Resumed'); // Debug
+        }
+    );
+}
 
-    // Set interval untuk memperbarui waktu setiap detik
-    setInterval(updateTime, 1000);
+// Panggil setelah tabel di-draw pertama kali
+setTimeout(initAutoScroll, 2000); // Tunggu 2 detik biar DataTables selesai render
+// Fungsi untuk memperbarui waktu secara dinamis
+function updateTime() {
+    const now = new Date();
+    const options = {
+        timeZone: 'Asia/Jakarta',
+        hour12: false
+    };
+    let timeString = now.toLocaleTimeString('id-ID', options);
+    timeString = timeString.replace(/\./g, ':');
+    document.getElementById('time').innerText = timeString;
+}
 
-    // Menampilkan hari, tanggal, bulan, dan tahun secara dinamis
-    function updateDate() {
-        const now = new Date();
-        const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September",
-            "Oktober", "November", "Desember"
-        ];
-        const dayName = days[now.getDay()];
-        const date = now.getDate();
-        const monthName = months[now.getMonth()];
-        const year = now.getFullYear();
-        document.getElementById('day-date').innerText = `${dayName}, ${date} ${monthName} ${year}`;
-    }
+setInterval(updateTime, 1000);
 
-    updateDate(); // Panggil fungsi untuk memperbarui tanggal
+// Menampilkan hari, tanggal, bulan, dan tahun secara dinamis
+function updateDate() {
+    const now = new Date();
+    const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September",
+        "Oktober", "November", "Desember"
+    ];
+    const dayName = days[now.getDay()];
+    const date = now.getDate();
+    const monthName = months[now.getMonth()];
+    const year = now.getFullYear();
+    document.getElementById('day-date').innerText = `${dayName}, ${date} ${monthName} ${year}`;
+}
 
-    // Slider otomatis
-    let currentIndex = 0;
-    const images = document.querySelectorAll('.image-slider img');
-    const totalImages = images.length;
-
-    function showNextImage() {
-        images[currentIndex].classList.remove('active');
-        currentIndex = (currentIndex + 1) % totalImages;
-        images[currentIndex].classList.add('active');
-    }
-    </script>
+updateDate();
+</script>
 </body>
 
 </html>

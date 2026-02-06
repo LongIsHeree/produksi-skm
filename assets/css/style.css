@@ -240,5 +240,12 @@ th {
         background-color: #f2f2f2; /* Warna latar belakang untuk baris ganjil */
     }
 }
+table.dataTable thead th{
+    background-color: #ff0000;
+}
+/* Hover effect */
+table.dataTable thead th:hover {
+    background: linear-gradient(135deg, #c82333 0%, #b30000 100%) !important;
+}
 
 

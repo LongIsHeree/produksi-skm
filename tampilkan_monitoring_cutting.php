@@ -26,7 +26,7 @@ function getTotalYesterday($tgl){
     return mysqli_fetch_assoc($q)['total'] ?? 0;
 }
 
-$tgl = date('Y-m-d');
+$tgl = '2026-02-05';
 $totalToday = getTotalToday($tgl);
 $totalYesterday = getTotalYesterday($tgl);
 
@@ -47,9 +47,10 @@ $totalYesterday = getTotalYesterday($tgl);
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
  <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <title>SEWING MONITORING</title>
+    <title>CUTTING DAILY MONITORING</title>
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <style>
+    
     .main-header {
         position: relative;
         background: #0a0f1c;
@@ -89,6 +90,40 @@ $totalYesterday = getTotalYesterday($tgl);
             left: 100%;
         }
     }
+
+.dataTables_wrapper .dataTables_scrollBody {
+    border: 1px solid #ddd;
+}
+
+
+.dataTables_wrapper {
+    position: relative;
+}
+
+.dataTables_wrapper::before {
+    content: '';
+    position: absolute;
+    top: 50px; /* Setelah header */
+    left: 0;
+    right: 17px; /* Space untuk scrollbar */
+    height: 30px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.9), transparent);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.dataTables_wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 17px;
+    height: 30px;
+    background: linear-gradient(to top, rgba(255,255,255,0.9), transparent);
+    z-index: 10;
+    pointer-events: none;
+}
+
 
     /* Glow logo & lottie */
     .main-header img {
@@ -232,36 +267,27 @@ $totalYesterday = getTotalYesterday($tgl);
    <script>
 $(document).ready(function() {
     $('#outputTable').DataTable({
-        responsive: true,
-        pageLength: 10,
-        lengthMenu: [10, 25, 50, 100],
-        order: [[5, 'asc']], 
+        responsive: false, 
+        paging: false,     
+        searching: false,  
+        info: false,      
+        scrollY: '450px',  
+        scrollCollapse: true,
+        order: [[5, 'asc']], // Sort by DAILY ascending
         columnDefs: [
-            { width: "10%", targets: 0, className:"text-center"},   // NO
-            { width: "20%", targets: 1, className:"text-center" },   // LINE
-            { width: "40%", targets: 2, className:"text-center" },  // ORC
-            { width: "20%", targets: 3, className: "text-center" }, // ORDER
-            { width: "10%", targets: 4, className: "text-center" }, // YERTERDAY
-            { width: "10%", targets: 5, className: "text-center" },// TODAY
+            { width: "5%", targets: 0, className:"text-center"},   // NO
+            { width: "15%", targets: 1, className:"text-center" },  // LINE
+            { width: "30%", targets: 2, className:"text-center" },  // ORC
+            { width: "15%", targets: 3, className: "text-center" }, // ORDER
+            { width: "10%", targets: 4, className: "text-center" }, // YESTERDAY
+            { width: "15%", targets: 5, className: "text-center" }, // TODAY
             { width: "10%", targets: 6, className: "text-center" }  // BALANCING  
-        ],
-        language: {
-            search: "Cari:",
-            lengthMenu: "Tampilkan _MENU_ data",
-            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-            paginate: {
-                first: "Awal",
-                last: "Akhir",
-                next: "→",
-                previous: "←"
-            },
-            zeroRecords: "Tidak ada data ditemukan"
-        }
+        ]
     });
 });
 
 var options = {
-    chart:{ type:'bar', height:450, },
+    chart:{ type:'bar', height:515, },
     series:[
         { name:'Yesterday', data:[] },
         { name:'Today', data:[] }
@@ -349,7 +375,48 @@ fetchDataAndUpdate();
 
 // Auto refresh setiap 30 detik
 setInterval(fetchDataAndUpdate, 30000);
+// Auto scroll tabel - PERBAIKAN
+function initAutoScroll() {
+    let scrollPosition = 0;
+    let scrollSpeed = 1; // Kecepatan scroll (pixel per frame)
+    let isPaused = false;
+    
+    setInterval(function() {
+        if (isPaused) return;
+        
+        // ✅ Selector yang benar untuk DataTables scroll body
+        const scrollBody = document.querySelector('.dataTables_scrollBody');
+        
+        if (!scrollBody) {
+            console.log('ScrollBody not found'); // Debug
+            return;
+        }
+        
+        scrollPosition += scrollSpeed;
+        
+        // Reset ke atas jika sudah sampai bawah
+        if (scrollPosition >= scrollBody.scrollHeight - scrollBody.clientHeight) {
+            scrollPosition = 0;
+        }
+        
+        scrollBody.scrollTop = scrollPosition;
+    }, 50); // Scroll setiap 50ms
+    
+    // Pause on hover
+    $('#outputTable').hover(
+        function() { 
+            isPaused = true; 
+            console.log('Paused'); // Debug
+        },
+        function() { 
+            isPaused = false; 
+            console.log('Resumed'); // Debug
+        }
+    );
+}
 
+// Panggil setelah tabel di-draw pertama kali
+setTimeout(initAutoScroll, 2000);
 // Fungsi untuk memperbarui waktu secara dinamis
 function updateTime() {
     const now = new Date();
