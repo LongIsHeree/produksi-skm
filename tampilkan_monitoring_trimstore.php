@@ -286,7 +286,7 @@ $(document).ready(function() {
 });
 
 var options = {
-    chart:{ type:'bar', height:515, },
+    chart:{ type:'area', height:515, },
     series:[
         { name:'Yesterday', data:[] },
         { name:'Today', data:[] }
