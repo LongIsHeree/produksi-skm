@@ -56,14 +56,14 @@ function getData($koneksi, $tgl, $status, $orc, $style, $line, $category, $costo
      ORDER BY C.id_order DESC
      LIMIT 1000) A 
      LEFT OUTER JOIN 
-     (SELECT A.tanggal, C.id_order, SUM(IFNULL(A.qty,0)) daily FROM transaksi_trimstore A
+     (SELECT A.tanggal, C.id_order, SUM(IFNULL(A.qty,0)) daily FROM transaksi_tatami A
      JOIN master_bundle B ON A.kode_barcode = B.barcode_bundle
      JOIN order_detail C ON B.id_order_detail = C.id_order_detail
      WHERE tanggal = '$tgl' 
      GROUP BY C.id_order)B
      ON A.id_order = B.id_order
       LEFT OUTER JOIN 
-     (SELECT MAX(A.tanggal) tanggal_max, C.id_order, SUM(IFNULL(A.qty,0)) output_total FROM transaksi_trimstore A
+     (SELECT MAX(A.tanggal) tanggal_max, C.id_order, SUM(IFNULL(A.qty,0)) output_total FROM transaksi_tatami A
      JOIN master_bundle B ON A.kode_barcode = B.barcode_bundle
      JOIN order_detail C ON B.id_order_detail = C.id_order_detail
      WHERE tanggal <= '$tgl' 
@@ -77,7 +77,7 @@ function getData($koneksi, $tgl, $status, $orc, $style, $line, $category, $costo
       JOIN order_detail C ON B.id_order_detail = C.id_order_detail
       GROUP BY C.id_order)AD
      ON A.id_order = AD.id_order 
-     WHERE AC.table_transaksi = 'transaksi_trimstore'
+     WHERE AC.table_transaksi = 'transaksi_tatami'
      $lineFilter
     ";
 
@@ -126,7 +126,7 @@ function getBalances($koneksi, $tanggal, $status, $orc, $style, $line) {
     FROM master_order MO
     JOIN order_detail OD ON OD.id_order = MO.id_order
     JOIN master_bundle MB ON MB.id_order_detail = OD.id_order_detail
-    LEFT JOIN transaksi_trimstore C2 ON C2.kode_barcode = MB.barcode_bundle AND C2.tanggal <= '{$tanggal}'
+    LEFT JOIN transaksi_tatami C2 ON C2.kode_barcode = MB.barcode_bundle AND C2.tanggal <= '{$tanggal}'
     JOIN style ST ON MO.id_style = ST.id_style
     WHERE MO.status = '{$status}'
       AND MO.orc LIKE '%{$orc}%'

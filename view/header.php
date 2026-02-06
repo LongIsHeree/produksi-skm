@@ -262,6 +262,7 @@
                   <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_qcendline.php">CHART QC ENDLINE ALL LINE</a></li>
                   <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_cutting.php">CHART CUTTING</a></li>
                   <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_trimstore.php">CHART TRIMSTORE</a></li>
+                  <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_packing.php">CHART PACKING</a></li>
                 </ul>
               </li>
               <li style="background: #254681"><a style="background: #254681" href="#">PREPARATION PRODUCTION</a>

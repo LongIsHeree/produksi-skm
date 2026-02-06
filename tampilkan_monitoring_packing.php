@@ -45,7 +45,7 @@ $totalYesterday = getTotalYesterday($tgl);
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
  <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <title>TRIMSTORE MONITORING</title>
+    <title>PACKING MONITORING</title>
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <style>
  
@@ -201,7 +201,7 @@ $totalYesterday = getTotalYesterday($tgl);
                     <div class="col-md-5">
                         <div class="card shadow mb-4">
                             <div class="card-body">
-                                <h2><i class="fas fa-bullhorn"></i> TRIMSTORE TODAY & YESTERDAY OUTPUT</h2>
+                                <h2><i class="fas fa-bullhorn"></i> PACKING TODAY & YESTERDAY OUTPUT</h2>
                                 <br>
                             
                                <table id="outputTable" class="table table-striped table-hover table-bordered nowrap w-100">
@@ -319,7 +319,7 @@ function fetchDataAndUpdate(){
         line: 'all'
     });
 
-    fetch('get_outputtrim_data.php?' + params.toString())
+    fetch('get_outputpack_data.php?' + params.toString())
     .then(res => res.json())
     .then(data => {
         console.log('Data received:', data);
