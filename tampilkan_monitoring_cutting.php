@@ -26,7 +26,7 @@ function getTotalYesterday($tgl){
     return mysqli_fetch_assoc($q)['total'] ?? 0;
 }
 
-$tgl = '2026-02-05';
+$tgl = date('Y-m-d');
 $totalToday = getTotalToday($tgl);
 $totalYesterday = getTotalYesterday($tgl);
 
