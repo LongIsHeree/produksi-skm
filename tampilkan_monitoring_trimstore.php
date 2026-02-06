@@ -92,7 +92,23 @@ $totalYesterday = getTotalYesterday($tgl);
 .dataTables_wrapper .dataTables_scrollBody {
     border: 1px solid #ddd;
 }
-
+      .animated-title {
+            display: inline-block;
+            background: linear-gradient(45deg, #000000, #2b80ff, #000000);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient 3s ease infinite;
+            text-shadow: 0 0 20px rgba(0, 247, 255, 0.5);
+            font-weight: bold;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
 .dataTables_wrapper {
     position: relative;
@@ -190,7 +206,9 @@ $totalYesterday = getTotalYesterday($tgl);
                                 <div class="row">
                                     <div class="col">
                                         <h3>
-                                            <center><strong>TODAY & YESTERDAY OUTPUT CHART </strong></center>
+                                            <center> <strong class="animated-title" id="chartTitle">
+                                                    TODAY & YESTERDAY OUTPUT CHART
+                                                </strong></center>
                                         </h3>
                                         <div id="todayChart"></div>
                                     </div>
@@ -201,7 +219,7 @@ $totalYesterday = getTotalYesterday($tgl);
                     <div class="col-md-5">
                         <div class="card shadow mb-4">
                             <div class="card-body">
-                                <h2><i class="fas fa-bullhorn"></i> TRIMSTORE TODAY & YESTERDAY OUTPUT</h2>
+                                <h2><center><i class="fas fa-bullhorn"></i> TRIMSTORE OUTPUT</center></h2>
                                 <br>
                             
                                <table id="outputTable" class="table table-striped table-hover table-bordered nowrap w-100">
@@ -262,9 +280,29 @@ $totalYesterday = getTotalYesterday($tgl);
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
    <script>
 $(document).ready(function() {
+   
+        anime({
+            targets: '#chartTitle',
+            translateY: [
+                { value: -20, duration: 1200, easing: 'easeOutQuad' },
+                { value: 0, duration: 1200, easing: 'easeOutBounce' }
+            ],
+            rotate: [
+              
+                { value: 0, duration: 400 }
+            ],
+            scale: [
+                { value: 1.1, duration: 400 },
+                { value: 1, duration: 400 }
+            ],
+            loop: true,
+            delay: 2000, 
+            direction: 'normal'
+        });
         $('#outputTable').DataTable({
         responsive: false, 
         paging: false,     
@@ -378,7 +416,7 @@ setInterval(fetchDataAndUpdate, 60000);
 // Auto scroll tabel - PERBAIKAN
 function initAutoScroll() {
     let scrollPosition = 0;
-    let scrollSpeed = 1; // Kecepatan scroll (pixel per frame)
+    let scrollSpeed = 0.5; // Kecepatan scroll (pixel per frame)
     let isPaused = false;
     
     setInterval(function() {
