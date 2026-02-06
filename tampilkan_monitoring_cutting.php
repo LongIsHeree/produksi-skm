@@ -373,8 +373,8 @@ function fetchDataAndUpdate(){
 // Panggil pertama kali
 fetchDataAndUpdate();
 
-// Auto refresh setiap 30 detik
-setInterval(fetchDataAndUpdate, 30000);
+// Auto refresh setiap 1 menit
+setInterval(fetchDataAndUpdate, 60000);
 // Auto scroll tabel - PERBAIKAN
 function initAutoScroll() {
     let scrollPosition = 0;
@@ -384,7 +384,7 @@ function initAutoScroll() {
     setInterval(function() {
         if (isPaused) return;
         
-        // ✅ Selector yang benar untuk DataTables scroll body
+       
         const scrollBody = document.querySelector('.dataTables_scrollBody');
         
         if (!scrollBody) {
