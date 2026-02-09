@@ -28,6 +28,7 @@
 
 <div style="margin-left: 20px; margin-right: 20px; margin-bottom: 20px;">
   <button style="background: #254681; color: white; margin: 4px 4px 4px; padding: 4px 4px 4px;" id="btnExportToExcel">Export To Excel</button>
+  <button style="background: #9b0101; color: white; margin: 4px 4px 4px; padding: 4px 4px 4px;" id="btnExportToPdf">Print</button>
 </div>
 
 <div id="tableContainer">
@@ -94,7 +95,8 @@
   <thead>
     <tr>
       <th style="background-color:#20B2AA; color: #ffffff" rowspan="2"><center>NO CTN</center></th>
-      <th style="background-color:#20B2AA; color: #ffffff" rowspan="2"><center>NO SCAN</center></th>
+      <th style="background-color:#20B2AA; color: #ffffff" rowspan="2"><center>BARCODE KARTON</center></th>
+      <th style="background-color:#20B2AA; color: #ffffff" rowspan="2"><center>QR CODE</center></th>
       <th style="background-color:#20B2AA; color: #ffffff" rowspan="2"><center>TGL SCAN</center></th>
       <th style="background-color:#20B2AA; color: #ffffff" rowspan="2"><center>LABEL</center></th>
       <th style="background-color:#20B2AA; color: #ffffff" rowspan="2"><center>STYLE</center></th>
@@ -122,6 +124,9 @@
     <tr class="belang">
       <td align='center'><?= $no ?></td>
       <td align='center'><?= $pilih2['no_trx'] ?></td>
+     <td align='center'>
+  <div id="qrcode-<?= $no ?>" data-barcode="<?= $pilih2['no_trx'] ?>"></div>
+</td>
       <td align='center'><?= tgl_indonesia3($pilih2['tanggal']) ?></td>
       <td align='center'><?= $pilih2['label'] ?></td>
       <td align='center'><?= $pilih2['style'] ?></td>
@@ -148,15 +153,17 @@
             echo 'MIX STYLE';
           } ?></td>
     </tr>
+     
     <?php
         $no_karton2++;
         $no_karton3++;
         $qty_total += $pilih2['jumlah_size'];
         $qty_total_semua += $pilih2['jumlah_size'];
+        
       }      
       ?>
     <tr class="belang">
-      <td colspan="6" style="background-color:#20B2AA; color: #ffffff; align=center">Total QTY :</td>
+      <td colspan="7" style="background-color:#20B2AA; color: #ffffff; align=center">Total QTY :</td>
       <?php 
         $ListSize2 = tampilkan_size_transaksi_packing_orc2($tgl, $orc2); 
         while($size2 = mysqli_fetch_array($ListSize2)){ ?>
@@ -166,12 +173,12 @@
       <td align="center" style="background-color:#20B2AA; color: #ffffff; "></td>
     </tr> 
     <tr>
-      <td colspan="<?php $total_size = cek_jumlah_size_orc2($tgl, $orc2) + 8; echo $total_size;  ?>">
+      <td colspan="<?php $total_size = cek_jumlah_size_orc2($tgl, $orc2) + 9; echo $total_size;  ?>">
         Total Quantity : <?= $qty_total ?> PCS
       </td>
     </tr>
     <tr>
-      <td colspan="<?php $total_size = cek_jumlah_size_orc2($tgl, $orc2) + 8; echo $total_size;  ?>">
+      <td colspan="<?php $total_size = cek_jumlah_size_orc2($tgl, $orc2) + 9; echo $total_size;  ?>">
         Total Karton : <?= $no_karton2 ?> Karton
       </td>
     </tr>
@@ -199,8 +206,27 @@ TOTAL SCAN Semuanya : <br>
   Jumlah Karton : <?php $total_ctn = $no_karton3 + $tot_jmlh_karton2 + $tot_jmlh_karton3; echo $total_ctn; ?> Karton
 
 </div>
-<script src="assets/js/jquery.min.js"></script>
 <script>
+window.addEventListener('load', function() {
+    document.querySelectorAll('[id^="qrcode-"]').forEach(function(element) {
+        let barcodeValue = element.getAttribute('data-barcode');
+        if(barcodeValue) {
+            new QRCode(element, {
+                text: barcodeValue,
+                width: 80,
+                height: 80,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+    });
+});
+</script>
+<script src="assets/js/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  
   $(document).ready(function(){
     $('#btnExportToExcel').click(function(e) {
       let file = new Blob([$('#tableContainer').html()], {
@@ -213,5 +239,9 @@ TOTAL SCAN Semuanya : <br>
       }).appendTo("body").get(0).click();
       e.preventDefault();
     });    
+ $('#btnExportToPdf').click(function(e) {
+    e.preventDefault();
+    window.print();
+});
   });
 </script>
