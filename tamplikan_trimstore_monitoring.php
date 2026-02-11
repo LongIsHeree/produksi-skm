@@ -5,6 +5,7 @@
 
 <html>
    <head>
+      <link rel="icon" href="img/icon.PNG">
       <style>
          body{
             overflow: hidden;

@@ -213,7 +213,7 @@
               <li style="background: #254681"><a style="background: #254681" href="temp_kenzin.php">NEEDLE DETECTOR</a></li>
               <li style="background: #254681"><a style="background: #254681" href="temp_packing.php">PACKING</a></li>
               <li style="background: #254681"><a style="background: #254681" href="#">REJECT</a>
-              <li style="background: #254681"><a style="background: #254681" href="#">SCAN KARTON FULL</a>
+              <li style="background: #254681"><a style="background: #254681" href="temp_carton.php">SCAN KARTON FULL</a>
                 <ul>
                   <!-- <li><a href="temp_reject_tatami.php">TATAMI REJECT</a></li> -->
                 </ul>
@@ -259,10 +259,11 @@
                   <li style="background: #254681"><a style="background: #254681" href="tv_laporan_hasil_scan_global_sewing2.php">SEWING PROD</a></li>
                   <li style="background: #254681"><a style="background: #254681" href="tv_laporan_preparation_production.php">REPORT TV</a></li>
                   <li style="background: #254681"><a style="background: #254681" href="reminder_qc_endline_target.php?lantai=1">REMINDER TARGET LT.1</a></li>
-                  <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_qcendline.php">CHART QC ENDLINE ALL LINE</a></li>
-                  <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_cutting.php">CHART CUTTING</a></li>
-                  <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_trimstore.php">CHART TRIMSTORE</a></li>
-                  <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_packing.php">CHART PACKING</a></li>
+                  <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_all_proses.php" target="_blank">PRODUCTION MONITORING</a></li>
+                  <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_qcendline.php" target="_blank">CHART QC ENDLINE ALL LINE</a></li>
+                  <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_cutting.php" target="_blank">CHART CUTTING</a></li>
+                  <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_trimstore.php" target="_blank">CHART TRIMSTORE</a></li>
+                  <li style="background: #254681"><a style="background: #254681" href="tampilkan_monitoring_packing.php" target="_blank">CHART PACKING</a></li>
                 </ul>
               </li>
               <li style="background: #254681"><a style="background: #254681" href="#">PREPARATION PRODUCTION</a>

@@ -47,6 +47,7 @@
 
 <html>
    <head>
+      <link rel="icon" href="img/icon.PNG">
       <style>
          ::-webkit-scrollbar{
             width: 0px;

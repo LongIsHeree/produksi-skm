@@ -17,7 +17,9 @@ if(isset($_SESSION['username'])){
     $table = $datatransaksi['table_transaksi'];
     $temp_table = $datatransaksi['table_temporary'];
     $tipe = $datatransaksi['tipe'];
-    
+    // var_dump($table);
+    // var_dump($temp_table);
+    // die;
     if(isset($_POST['update'])){
       $id   = $_POST['id_transaksi'];
       $update_qty_tambah   = $_POST['qty_scan'];
@@ -45,7 +47,7 @@ if(isset($_SESSION['username'])){
 
 <center>
 <font color="blue">
-<h2>TRANSAKSI TATAMI </h2>
+<h2>TRANSAKSI CARTON </h2>
 Username Aktif : <?= cek_status($_SESSION['username']) ?></font>
 <div style="height:55px;">
                  <?php
