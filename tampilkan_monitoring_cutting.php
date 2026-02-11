@@ -408,9 +408,9 @@ function fetchDataAndUpdate(){
 // Panggil pertama kali
 fetchDataAndUpdate();
 
-// Auto refresh setiap 1 menit
-setInterval(fetchDataAndUpdate, 60000);
-// Auto scroll tabel - PERBAIKAN
+// Auto refresh setiap 5 menit
+setInterval(fetchDataAndUpdate, 5000);
+// Auto scroll tabel 
 function initAutoScroll() {
     let scrollPosition = 0;
     let scrollSpeed = 0.5; // Kecepatan scroll (pixel per frame)

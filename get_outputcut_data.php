@@ -72,7 +72,7 @@ function getData($koneksi, $tgl, $status, $orc, $style, $line, $category, $costo
      JOIN proses_transaksi_orc AB ON A.id_order = AB.id_order
      JOIN master_transaksi AC ON AB.nama_transaksi = AC.nama_transaksi 
      LEFT OUTER JOIN
-      (SELECT C.id_order, IFNULL(MAX(A.line), 'not_yet') line FROM transaksi_sewing A
+      (SELECT C.id_order, IFNULL(A.line, 'not_yet') line FROM transaksi_sewing A
       JOIN master_bundle B ON A.kode_barcode = B.barcode_bundle
       JOIN order_detail C ON B.id_order_detail = C.id_order_detail
       GROUP BY C.id_order)AD
