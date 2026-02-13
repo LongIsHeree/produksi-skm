@@ -2199,7 +2199,7 @@ function tampilkan_laporan_bundle_record_perjam($table, $tgl, $orc, $style, $sta
   }
   $query .= " GROUP BY A.id_order
   ORDER BY C.tanggal_max desc, B.daily asc
-  limit 50";
+  limit 100";
 
   $result = mysqli_query($koneksi, $query) or die('gagal menampilkan data');
 

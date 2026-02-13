@@ -80,16 +80,17 @@ $temp_produksi = tampilkan_temp_production_bundle($user, $temp_table, $table);
     <th class="tengah theader" rowspan=2 style="vertical-align:middle; background: #254681;"><center>STYLE</center></th>
     <th class="tengah theader" rowspan=2 style="vertical-align:middle; background: #254681;"><center>Color</center></th>
     <th class="tengah theader" rowspan=2 style="vertical-align:middle; background: #254681;"><center>Label</center></th>
-    <th class="tengah theader" rowspan=2 style="vertical-align:middle; background: #254681;"><center>Size</center></th>
-    <th class="tengah theader" colspan=4 style="background: #254681;"><center>Qty</center></th>
+    <th style="background-color:#20B2AA; color: #ffffff" colspan="<?= cek_jumlah_size_orc2($tgl, $orc2); ?>"><center>SIZE</center></th>
+    <th class="tengah theader" rowspan=2 style="background: #254681;"><center>Qty</center></th>
     <th class="tengah theader" rowspan=2 style="vertical-align:middle; background: #254681;"><center>Act</center></th>
   </tr>
-  <tr>
-    <th class="tengah theader" style="background: #254681;"><center>BUNDLE</center></th>
-    <th class="tengah theader" style="background: #254681;"><center>BEFORE</center></th>
-    <th class="tengah theader" style="background: #254681;"><center>SCAN</center></th>
-    <th class="tengah theader" style="background: #254681;"><center>BAL</center></th>
-  </tr>
+   <tr>
+        <?php $ListSize2 = tampilkan_size_transaksi_packing_orc2($tgl, $orc2); 
+        while($size2 = mysqli_fetch_array($ListSize2)){ ?>
+          <th style="background-color:#20B2AA; color: #ffffff"><center><?= $size2['ukuran']; ?></center></th>
+        <?php } ?>
+        <th style="background-color:#20B2AA; color: #ffffff"><center>CTN</center></th>
+    </tr>
 </thead>
 <tbody>
 <?php
