@@ -81,7 +81,7 @@ Username Aktif : <?= cek_status($_SESSION['username']) ?></font>
  
 
 <div id="tampil_tabel"></div>
-<form action="simpan_trx_produksi_bundle.php" method="post" >
+<form action="simpan_trx_carton.php" method="post" >
 <center>
     <input type="hidden" id="user" name="user" value="<?= $_SESSION['username']; ?>">
     <input type="hidden" id="temp_table" name="temp_table" value="<?= $temp_table ?>">
@@ -114,17 +114,18 @@ Username Aktif : <?= cek_status($_SESSION['username']) ?></font>
     var proses = $('#proses').val();
     var user = $('#user').val();
     var tipe = $('#tipe').val();
-    var url = "tampil_trx_produksi.php?trx="+proses;
+    var url = "tampil_trx_carton.php";
   
     $.ajax({
       method: "POST",
-      url: "proses_trx_produksi_bundle.php",
+      url: "proses_trx_carton.php",
       data: { isi_barcode : barcode,
         temp_table : temp_table,
         table : table,
         proses : proses,
         user : user,
         tipe : tipe 
+
       },
       success: function(data){
         console.log(data.trim());
@@ -144,8 +145,8 @@ Username Aktif : <?= cek_status($_SESSION['username']) ?></font>
         }else if(data.trim() == "over_bundle"){
           Swal.fire({
                   type: 'error',
-                  title: 'Qty Scan Lebih dari QTY Ticket bundle',
-                  text: 'Silakan Laporan Sistem Bundle Record  !',
+                  title: 'Karton Sudah Pernah Di Scan !',
+                  text: 'Silakan Scan Karton Lain  !',
                   allowEnterKey: false,  
           });
         }else if(data.trim() == "over_before"){
@@ -173,7 +174,7 @@ Username Aktif : <?= cek_status($_SESSION['username']) ?></font>
 
   $(document).ready(function(){
     var proses = $('#proses').val();
-    var url = "tampil_trx_produksi.php?trx="+proses;
+    var url = "tampil_trx_carton.php?trx="+proses;
     console.log(url);
     $('#tampil_tabel').load(url);
   });

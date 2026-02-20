@@ -3,14 +3,20 @@
   // if(cek_status($_SESSION['username'] ) == 'admin' OR cek_status($_SESSION['username'] ) == 'cutting' 
   // OR cek_status($_SESSION['username'] ) == 'SEWING' ) {
     $user = $_SESSION['username'];
-    $transaksi = $_GET['trx'];
+    $transaksi = 'carton';
    
 
     $temp1 = mencari_data_master_transaksi($transaksi);
     $datatransaksi = mysqli_fetch_array($temp1);
     $temp_table = $datatransaksi['table_temporary'];
     $table = $datatransaksi['table_transaksi'];
-  
+    // Ambil orc dari temp table berdasarkan user yang login
+$query_orc = mysqli_query($koneksi, "SELECT orc FROM $temp_table WHERE username = '$user' LIMIT 1");
+$data_orc  = mysqli_fetch_assoc($query_orc);
+$orc2      = $data_orc['orc'];
+    
+    
+
 ?>
   <link rel="stylesheet" href="view/style.css">
 
@@ -67,7 +73,20 @@ Total Qty Scan :
 </tr>
 </table>
 <?php
-$temp_produksi = tampilkan_temp_production_bundle($user, $temp_table, $table);
+$query = "SELECT  A.no_trx, A.kode_barcode, A.orc, A.qty,
+                 B.no_po, B.label, B.color,
+                 D.style,
+                 E.costomer,
+                 TP.kelompok
+          FROM $temp_table A
+          JOIN master_order B ON A.orc = B.orc
+          JOIN style D ON B.id_style = D.id_style
+          JOIN costomer E ON B.id_costomer = E.id_costomer
+          JOIN transaksi_packing TP ON A.kode_barcode = TP.no_trx
+          WHERE A.username = '$user'
+          ORDER BY A.no_trx DESC";
+
+$result = mysqli_query($koneksi, $query) or die('gagal menampilkan data: ' . mysqli_error($koneksi));
 ?>
 
 <table border="1px" id="example" class="table table-striped table-bordered data" style="font-size: 12px">
@@ -80,63 +99,57 @@ $temp_produksi = tampilkan_temp_production_bundle($user, $temp_table, $table);
     <th class="tengah theader" rowspan=2 style="vertical-align:middle; background: #254681;"><center>STYLE</center></th>
     <th class="tengah theader" rowspan=2 style="vertical-align:middle; background: #254681;"><center>Color</center></th>
     <th class="tengah theader" rowspan=2 style="vertical-align:middle; background: #254681;"><center>Label</center></th>
-    <th style="background-color:#20B2AA; color: #ffffff" colspan="<?= cek_jumlah_size_orc2($tgl, $orc2); ?>"><center>SIZE</center></th>
+    <th style="background-color:#20B2AA; color: #ffffff" colspan="<?= cek_jumlah_size_orc2($tanggal, $orc2); ?>"><center>SIZE</center></th>
     <th class="tengah theader" rowspan=2 style="background: #254681;"><center>Qty</center></th>
-    <th class="tengah theader" rowspan=2 style="vertical-align:middle; background: #254681;"><center>Act</center></th>
+    <th class="tengah theader" rowspan=2 style="vertical-align:middle; background: #254681;"><center>Ket CTN</center></th>
   </tr>
    <tr>
-        <?php $ListSize2 = tampilkan_size_transaksi_packing_orc2($tgl, $orc2); 
+        <?php $ListSize2 = tampilkan_size_transaksi_packing_orc2($tanggal, $orc2); 
         while($size2 = mysqli_fetch_array($ListSize2)){ ?>
           <th style="background-color:#20B2AA; color: #ffffff"><center><?= $size2['ukuran']; ?></center></th>
         <?php } ?>
-        <th style="background-color:#20B2AA; color: #ffffff"><center>CTN</center></th>
     </tr>
 </thead>
 <tbody>
 <?php
 $no=1;
 $subtotal_qty=0;
-while($row=mysqli_fetch_assoc($temp_produksi))
-{ 
-
-// $subtotal_qty += $row['qty'];
-   ?>
-  <tr>
-  <script type="text/javascript" language="JavaScript">
-function konfirmasi_kurangi()
-{
-tanya3 = confirm("Yakin ingin kurangi stok ini");
-if (tanya3 == true) return true;
-else return false;
-}</script>
-
-<td class="tengah"><?= $no; ?></td>
-  <td class="tengah"><?= $row['kode_barcode']; ?></td>
-  <td class="tengah"><?= $row['orc']; ?></td>
-  <td class="tengah"><?= $row['no_po']; ?></td>
-  <td class="tengah"><?= $row['no_bundle']; ?></td>
-  <td class="tengah"><?= $row['style'];  ?> </td>
-  <td class="tengah"><?= $row['color'];  ?> </td>
-  <td class="tengah"><?= $row['label'];  ?> </td>
-  <td class="tengah"><?= $row['size'].$row['cup'];  ?> </td> 
-  <td class="tengah"><?= $row['qty_isi_bundle']; ?></td>
-  <td class="tengah"><?= $row['qty_tersimpan']; ?></td>
-  <td class="tengah"><font color="blue"><b><?= $row['qty_scan']; ?></b></font></td>
-  <td class="tengah"><?= $row['balance']; ?></td>
-  <td>
-  <!-- <button type="button" id="edit" data-toggle="modal" data-target="#myEdit" class="btn btn-success edit_komentar kecil" data-order="<//?= $row['id_order']; ?>" data-id="<//?= $row['id_transaksi']; ?>"><i class="glyphicon glyphicon-edit"></i></button>   -->
-
-  <!-- <button type="button" data-id="<//?= $row['id_transaksi'] ?>" class="btn btn-xs btn-danger kecil kurangi"><i class="glyphicon glyphicon-trash"></i></button> -->
-
-  <!-- <a href="hapus_trx_produksi_bundle.php?id=<//?= $row['id_transaksi'] ?>&tbl=<//?= $temp_table ?>"><button type="button" onclick="return konfirmasi()" class="btn btn-xs btn-danger kecil"><i class="glyphicon glyphicon-trash"></i></button></a> -->
-  
-  <!-- <td class="tengah"><a href="hapus_qc_kensa_satu.php?id=<//?= $row['id_transaksi']; ?>" onclick="return konfirmasi_kurangi()">DEL</a></td> -->
-  </td>  
-  </tr>
-
-  <?php
-    $no++;
+while($row = mysqli_fetch_assoc($result)){
+    // Ambil qty per size dari transaksi_packing berdasarkan kode_barcode
+    $query_sz = mysqli_query($koneksi, "SELECT CONCAT('size_', lower(trim(replace(replace(B.size, '-', '_'), '/', '_'))), lower(TRIM(ifnull(B.cup,'')))) as detail_size,
+                                               A.qty as qty_size
+                                        FROM transaksi_packing A
+                                        JOIN barang B ON A.kode_barcode = B.kode_barcode
+                                        LEFT OUTER JOIN size F ON B.size = F.size AND IFNULL(B.cup, '') = IFNULL(F.cup, '')
+                                        WHERE A.no_trx = '{$row['kode_barcode']}'
+                                        ORDER BY F.urutan");
+    
+    $size_data = [];
+    while($sz = mysqli_fetch_assoc($query_sz)){
+        $size_data[$sz['detail_size']] = $sz['qty_size'];
     }
+?>
+  <tr>
+    <td class="tengah"><?= $no; ?></td>
+    <td class="tengah"><?= $row['kode_barcode']; ?></td>
+    <td class="tengah"><?= $row['orc']; ?></td>
+    <td class="tengah"><?= $row['no_po']; ?></td>
+    <td class="tengah"><?= $row['style']; ?></td>
+    <td class="tengah"><?= $row['color']; ?></td>
+    <td class="tengah"><?= $row['label']; ?></td>
+
+    <?php 
+      $ListSize2 = tampilkan_size_transaksi_packing_orc2($tanggal, $orc2); 
+      while($size2 = mysqli_fetch_array($ListSize2)){ ?>
+        <td class="tengah"><?= $size_data[$size2['detail_size']] ?? 0; ?></td>
+    <?php } ?>
+
+    <td class="tengah"><b><?= $row['qty']; ?></b></td>
+    <td class="tengah"><?= $row['kelompok']; ?></td>
+  </tr>
+<?php
+    $no++;
+}
   ?>
 </tbody>
 </table>
