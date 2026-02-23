@@ -149,7 +149,15 @@ Username Aktif : <?= cek_status($_SESSION['username']) ?></font>
                   text: 'Silakan Scan Karton Lain  !',
                   allowEnterKey: false,  
           });
-        }else if(data.trim() == "over_before"){
+          
+        }else if(data.trim() == "beda_orc"){
+          Swal.fire({
+                  type: 'error',
+                  title: 'Beda ORC !',
+                  text: 'Silakan Scan Karton dengan ORC yang sama  !',
+                  allowEnterKey: false,  
+          });}
+          else if(data.trim() == "over_before"){
           Swal.fire({
                   type: 'error',
                   title: 'Qty Scan Lebih dari Total Scan QTY Ticket di Proses Sebelumnya ',

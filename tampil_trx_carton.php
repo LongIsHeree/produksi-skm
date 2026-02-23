@@ -13,7 +13,8 @@
     // Ambil orc dari temp table berdasarkan user yang login
 $query_orc = mysqli_query($koneksi, "SELECT orc FROM $temp_table WHERE username = '$user' LIMIT 1");
 $data_orc  = mysqli_fetch_assoc($query_orc);
-$orc2      = $data_orc['orc'];
+$orc2      = $data_orc['orc']??'';
+
     
     
 
@@ -145,7 +146,18 @@ while($row = mysqli_fetch_assoc($result)){
     <?php } ?>
 
     <td class="tengah"><b><?= $row['qty']; ?></b></td>
-    <td class="tengah"><?= $row['kelompok']; ?></td>
+    <td class="tengah"><?php 
+          if($row['kelompok'] == 'full'){
+            echo 'FULL';
+          }elseif($row['kelompok'] == 'ecer'){
+            echo 'NOT FULL';
+          }elseif($row['kelompok'] == 'mix'){
+            echo 'MIX SIZE';
+          }elseif($row['kelompok'] == 'mix_color'){
+            echo 'MIX COLOR';
+          }elseif($row['kelompok'] == 'mix_style'){
+            echo 'MIX STYLE';
+          } ?></td>
   </tr>
 <?php
     $no++;

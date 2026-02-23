@@ -21,7 +21,6 @@
         }
     }
 
-  // Tambahkan A.qty di query utama
 $query = "SELECT E.costomer, B.orc, B.no_po, B.label, D.style, B.color, C.warna, A.no_trx, A.qty
           From transaksi_packing A
           JOIN master_order B On A.orc = B.orc
@@ -43,9 +42,24 @@ if(mysqli_num_rows($result) == 0){
 $data = mysqli_fetch_assoc($result);
 
 // Cek apakah barcode sudah ada di temp table
-$cek = mysqli_query($koneksi, "SELECT * FROM $temp_table 
-                                WHERE kode_barcode = '$kode_barcode' 
-                                AND username = '$user'");
+$cek = mysqli_query($koneksi, "
+    SELECT 1 FROM $temp_table 
+    WHERE kode_barcode = '$kode_barcode'
+    AND username = '$user'
+    
+    UNION
+    
+    SELECT 1 FROM $table
+    WHERE kode_barcode = '$kode_barcode'
+");
+$cekORC = mysqli_query($koneksi, "SELECT * FROM $temp_table 
+                                    WHERE orc != '{$data['orc']}'
+                                    AND username = '$user'");
+if(mysqli_num_rows($cekORC)>0){
+    $pesan = 'beda_orc';
+    echo $pesan;
+    die();
+}
 
 if(mysqli_num_rows($cek) > 0){
      $pesan = 'over_bundle';
