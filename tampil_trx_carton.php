@@ -16,8 +16,6 @@ $data_orc  = mysqli_fetch_assoc($query_orc);
 $orc2      = $data_orc['orc']??'';
 
     
-    
-
 ?>
   <link rel="stylesheet" href="view/style.css">
 
@@ -59,11 +57,13 @@ NO TRANSAKSI : <?= $no_scan;  } ?>
 <font color="blue" size="5" background="green">
 Total Qty Scan :
 <?php
-    $temp_temp_qc_kensa = tampilkan_temp_production_bundle($user, $temp_table, $table);
+    $query = "SELECT qty FROM $temp_table 
+              WHERE username = '$user'";
+    $res = mysqli_query($koneksi, $query);
     $subtotal_qty=0;
-    while($data=mysqli_fetch_assoc($temp_temp_qc_kensa)){
+    while($data=mysqli_fetch_assoc($res)){
 
-    $subtotal_qty += $data['qty_scan'];
+    $subtotal_qty += $data['qty'];
     }
     echo $subtotal_qty;
 
