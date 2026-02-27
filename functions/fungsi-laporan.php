@@ -3325,6 +3325,32 @@ function cek_jumlah_size_orc2($tgl, $orc){
     return mysqli_num_rows($result);
 }
 }
+function get_size_orc($tgl, $orc): array {
+    global $koneksi;
+
+    $sizes = [];
+
+    $query = "
+        SELECT CONCAT('size_', LOWER(REPLACE(REPLACE(C.size,'-','_'),'/','_'))) as detail_size
+        FROM transaksi_packing A
+        JOIN master_order B ON A.orc = B.orc
+        JOIN Barang C ON A.kode_barcode = C.kode_barcode
+        WHERE A.tanggal <= '$tgl'
+        AND A.orc = '$orc'
+        AND A.shipment = 'n'
+        AND A.kelompok NOT IN ('mix_color','mix_style')
+        AND B.status = 'open'
+        GROUP BY C.size, C.cup
+    ";
+
+    $result = mysqli_query($koneksi, $query);
+
+    while($row = mysqli_fetch_assoc($result)){
+        $sizes[] = $row['detail_size'];
+    }
+
+    return $sizes;
+}
 
 function cek_jumlah_size_packing_notmix($tgl, $orc, $costomer, $no_po, $style){
   global $koneksi;

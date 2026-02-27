@@ -15,7 +15,7 @@ function tampilkan_transaksi_proses()
   global $koneksi;
 
 
-  $query = "SELECT * FROM master_transaksi where status = 'jalan' ORDER BY urutan limit 16";
+  $query = "SELECT * FROM master_transaksi where status = 'jalan' ORDER BY urutan limit 18";
   $result = mysqli_query($koneksi, $query) or die('gagal menampilkan data');
 
   return $result;
