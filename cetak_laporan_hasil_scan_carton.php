@@ -225,7 +225,7 @@ function initChart(){
     var options = {
         chart:{
             type:'donut',
-            height:250
+            height:300
         },
         series:[],
         labels:[],
@@ -337,36 +337,25 @@ function initChartQty2(){
     var options = {
         chart:{
             type:'line',
-            height:320,
+            height:300,
             toolbar:{
                 show:false
-            },
-            zoom:{
-                enabled:false
             },
             animations:{
                 enabled:true,
                 easing:'easeinout',
-                speed:700
+                speed:600
             }
         },
-
-        series:[{
-            name:'QTY',
-            data:[]
-        }],
-
-        stroke:{
-            curve:'smooth',
-            width:4
-        },
-
-        markers:{
-            size:5,
-            hover:{
-                size:8
+        plotOptions:{
+            bar:{
+                distributed:true,
+                borderRadius:6,
+                columnWidth:'55%'
             }
         },
+        
+        series:[],
 
         xaxis:{
             categories:[],
@@ -381,24 +370,33 @@ function initChartQty2(){
             }
         },
 
-        grid:{
-            borderColor:'#e7e7e7',
-            strokeDashArray:4
+        stroke:{
+            curve:'smooth',
+            width:3
+        },
+
+
+        markers:{
+            size:5
         },
 
         dataLabels:{
             enabled:false
         },
 
-        colors:['#3b82f6'],
+        colors:['#00ff88','#ffbb33','#ff4444','#33b5e5','#aa66cc','#99cc00'],
 
-        tooltip:{
-            shared:true,
-            intersect:false
-        }
+grid:{
+  borderColor:'#e7e7e7'
+},
+
+tooltip:{
+  shared:true,
+  intersect:false
+}
     };
 
-    chartQty = new ApexCharts(
+    chartQty2 = new ApexCharts(
         document.querySelector("#chartQty2"),
         options
     );
@@ -482,6 +480,7 @@ function loadChartSize(){
   $('.ganti').on('change',function(){
     loadChartSize();
     loadChartQty(); 
+    loadChartQty2();
     var proses = 'carton';
     let orc = $('#orc').val();
    var url = "tampil_tabel_laporan_hasil_scan_carton.php?orc="+orc;
@@ -538,6 +537,7 @@ function loadChartSize(){
 $(document).ready(function(){
     initChart();
     initChartQty();
+    initChartQty2();
 });
 
 

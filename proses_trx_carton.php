@@ -21,7 +21,7 @@
         }
     }
 
-$query = "SELECT E.costomer, B.orc, B.no_po, B.label, D.style, B.color, C.warna, A.no_trx, A.qty
+$query = "SELECT E.costomer, B.orc, B.no_po, B.label, D.style, B.color, C.warna, A.no_trx, A.qty,A.kelompok
           From transaksi_packing A
           JOIN master_order B On A.orc = B.orc
           JOIN Barang C On A.kode_barcode = C.kode_barcode
@@ -102,7 +102,6 @@ if($proses_db){
     echo "errorDb";
 }
 }
-
 
 
  
