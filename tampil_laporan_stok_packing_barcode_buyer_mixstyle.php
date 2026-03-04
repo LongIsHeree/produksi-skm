@@ -102,10 +102,12 @@
       <td align='center'><?= $pilih2['style'] ?></td>
       <td align='center'><?= $pilih2['warna'] ?></td>
         <?php $ListSize2 = tampilkan_size_transaksi_packing_mixstyle_notrx2($tgl, $no_trx); 
+       
         while($size2 = mysqli_fetch_array($ListSize2)){ ?>
       <td align='center'><?= $pilih2[$size2['detail_size']]; ?> 
         <?php 
           ${$size2['total_size']} +=  $pilih2[$size2['detail_size']];
+
         ?>
     </td>
         <?php } ?>

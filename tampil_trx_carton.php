@@ -11,10 +11,12 @@
     $temp_table = $datatransaksi['table_temporary'];
     $table = $datatransaksi['table_transaksi'];
     // Ambil orc dari temp table berdasarkan user yang login
-$query_orc = mysqli_query($koneksi, "SELECT A.kode_barcode, A.orc, TP.kelompok FROM $temp_table A join transaksi_packing TP on A.kode_barcode = TP.no_trx WHERE username = '$user' ");
-$data_orc  = mysqli_fetch_assoc($query_orc);
-$orc2      = $data_orc['orc']??'';
-$kelompok = $data_orc['kelompok']??'';
+$query_orc = mysqli_query($koneksi, "SELECT A.kode_barcode, TP.orc, TP.kelompok FROM $temp_table A join transaksi_packing TP on A.kode_barcode = TP.no_trx WHERE username = '$user' ");
+
+$data_orc = mysqli_fetch_assoc($query_orc);
+$orc2      = $data_orc['orc'] ?? '';
+ $kelompok = $data_orc['kelompok'] ?? '';
+//echo '<pre>' . json_encode($orc2, JSON_PRETTY_PRINT) . '</pre>';
 $kode_barcode = $data_orc['kode_barcode']??'';
 //echo '<pre>' . json_encode($kelompok, JSON_PRETTY_PRINT) . '</pre>';
 // die();
@@ -78,7 +80,7 @@ Total Qty Scan :
 </tr>
 </table>
 <?php
-
+if($kelompok == 'full' OR $kelompok == 'mix' OR $kelompok == 'mix_color' OR $kelompok == 'ecer'){
 $query = "SELECT  A.no_trx, A.kode_barcode, A.orc, A.qty, A.qty_isi_karton,
                  B.no_po, B.label, B.color,
                  D.style,
@@ -92,6 +94,23 @@ $query = "SELECT  A.no_trx, A.kode_barcode, A.orc, A.qty, A.qty_isi_karton,
           JOIN (SELECT no_trx, SUM(qty) as total_qty,kelompok FROM transaksi_packing GROUP BY no_trx) TP ON A.kode_barcode = TP.no_trx
           WHERE A.username = '$user'
           ORDER BY A.no_trx DESC";
+}else if($kelompok == 'mix_style'){
+  $query = "SELECT  A.no_trx, A.kode_barcode, TP.orc,
+                 B.no_po, B.label, B.color,
+                 D.style,
+                 E.costomer,
+                 TP.kelompok,
+                 '' as qty
+          FROM transaksi_packing TP
+          JOIN master_order B ON TP.orc = B.orc
+          JOIN style D ON B.id_style = D.id_style
+          JOIN costomer E ON B.id_costomer = E.id_costomer
+          JOIN $temp_table A ON A.kode_barcode = TP.no_trx
+          WHERE A.username = '$user' AND TP.kelompok = 'mix_style' AND TP.no_trx = A.kode_barcode
+          GROUP BY A.no_trx, D.id_style,  B.orc
+          ORDER BY A.no_trx DESC";
+}
+
 
 $result = mysqli_query($koneksi, $query) or die('gagal menampilkan data: ' . mysqli_error($koneksi));
 ?>
@@ -118,9 +137,9 @@ $result = mysqli_query($koneksi, $query) or die('gagal menampilkan data: ' . mys
   GROUP BY C.size, C.cup");
           $jumlahColspan = mysqli_num_rows($query);
 
-        // echo '<pre>' . json_encode('masuk mix style', JSON_PRETTY_PRINT) . '</pre>';
+
       }
-    // echo '<pre>' . json_encode($jumlahColspan, JSON_PRETTY_PRINT) . '</pre>';
+   // echo '<pre>' . json_encode($jumlahColspan, JSON_PRETTY_PRINT) . '</pre>';
     // die();
     ?>
     <th class="tengah theader" rowspan=2 style="vertical-align:middle; background: #254681;"><center>NO</center></th>
@@ -173,21 +192,52 @@ $subtotal_qty=0;
 
 // die();
 while($row = mysqli_fetch_assoc($result)){
+  $total_ctn = 0;
     // Ambil qty per size dari transaksi_packing berdasarkan kode_barcode
-    $query_sz = mysqli_query($koneksi, "SELECT CONCAT('size_', lower(trim(replace(replace(B.size, '-', '_'), '/', '_'))), lower(TRIM(ifnull(B.cup,'')))) as detail_size,
+    if($kelompok == 'full' OR $kelompok == 'mix' OR $kelompok == 'mix_color' OR $kelompok == 'ecer'){
+$query_sz = mysqli_query($koneksi, "SELECT CONCAT('size_', lower(trim(replace(replace(B.size, '-', '_'), '/', '_'))), lower(TRIM(ifnull(B.cup,'')))) as detail_size,
                                                A.qty as qty_size
                                         FROM transaksi_packing A
                                         JOIN barang B ON A.kode_barcode = B.kode_barcode
                                         LEFT OUTER JOIN size F ON B.size = F.size AND IFNULL(B.cup, '') = IFNULL(F.cup, '')
                                         WHERE A.no_trx = '{$row['kode_barcode']}'
                                         ORDER BY F.urutan");
+    }
+    
+    else if($kelompok == 'mix_style'){
+      $query_sz = "SELECT CONCAT(B.size, IFNULL(B.cup, ''))  as ukuran,
+  CONCAT('size_', lower(trim(replace(replace(B.size, '-', '_'), '/', '_'))), lower(TRIM(ifnull(B.cup,'')))) as detail_size ,
+  CONCAT('total_', lower(trim(replace(replace(B.size, '-', '_'), '/', '_'))), lower(TRIM(ifnull(B.cup,'')))) as total_size,
+  CONCAT('pilih2[&#39;size_',lower(trim(replace(replace(B.size, '-', '_'), '/', '_'))), lower(TRIM(ifnull(B.cup,''))),'&#39;]') as pilih_size,
+  A.qty as qty_size
+    FROM transaksi_packing A
+  JOIN barang B ON A.kode_barcode = B.kode_barcode
+  JOIN master_order C ON A.orc = C.orc
+  LEFT OUTER JOIN size F ON B.size = F.size AND IFNULL(B.cup, '') = IFNULL(F.cup, '')
+  WHERE A.tanggal <= '$tanggal' AND A.no_trx = '{$row['kode_barcode']}' AND A.shipment = 'n' AND
+  A.kelompok = 'mix_style' AND C.status = 'open' AND  A.orc = '{$row['orc']}'
+  group by B.size, B.cup
+  ORDER BY F.urutan";
+      $query_sz = mysqli_query($koneksi, $query_sz);
+
+  }
+  
+    
     
     $size_data = [];
+    
     while($sz = mysqli_fetch_assoc($query_sz)){
-        $size_data[$sz['detail_size']] = $sz['qty_size'];
-        
+      if($kelompok == 'full' OR $kelompok == 'mix' OR $kelompok == 'mix_color' OR $kelompok == 'ecer'){
+$size_data[$sz['detail_size']] = $sz['qty_size'];
+
+      }
+        else if($kelompok == 'mix_style'){
+          $size_data[$sz['detail_size']] = $sz['qty_size'];
+
+        }
+
     }
-  
+  //echo '<pre>' . json_encode($size_data, JSON_PRETTY_PRINT) . '</pre>';
 ?>
   <tr>
     <td class="tengah"><?= $no; ?></td>
@@ -208,14 +258,18 @@ while($row = mysqli_fetch_assoc($result)){
           //echo '<pre>' . json_encode('masuk mix style', JSON_PRETTY_PRINT) . '</pre>';
           }
       while($size2 = mysqli_fetch_array($ListSize2)){ ?>
-        <td class="tengah"><?= $size_data[$size2['detail_size']] ?? 0; ?></td>
+      <?php
+$val = $size_data[$size2['detail_size']] ?? 0;
+$total_ctn += $val;
+?>
+        <td class="tengah"><?= $val ?></td>
     <?php } ?>
     <?php 
     if($row['kelompok'] == 'full'){
     ?>
     <td class="tengah"><b><?= $row['qty_isi_karton']; ?></b></td>
     <?php } else { ?>
-    <td class="tengah"><b><?= $row['total_qty']; ?></b></td>
+    <td class="tengah"><b><?= $total_ctn ?></b></td>
     <?php } ?>
     <td class="tengah"><b><?= $row['qty']; ?></b></td>
    
