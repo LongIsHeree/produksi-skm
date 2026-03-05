@@ -151,13 +151,15 @@ $result = mysqli_query($koneksi, $query) or die('gagal menampilkan data: ' . mys
     <th class="tengah theader" rowspan=2 style="vertical-align:middle; background: #254681;"><center>Label</center></th>
     <th style="background-color:#20B2AA; color: #ffffff" colspan="<?= $jumlahColspan; ?>"><center>SIZE</center></th>
     <th class="tengah theader" rowspan=2 style="background: #254681;"><center>Isi Carton</center></th>
+    <?php if($kelompok == 'full' OR $kelompok == 'mix' OR $kelompok == 'mix_color' OR $kelompok == 'ecer'){ ?>
     <th class="tengah theader" rowspan=2 style="background: #254681;"><center>QTY</center></th>
+    <?php } else if($kelompok == 'mix_style'){ }?>
     <th class="tengah theader" rowspan=2 style="vertical-align:middle; background: #254681;"><center>Ket CTN</center></th>
   </tr>
    <tr>
         
         <?php
-        $ListSize2 = [];
+        $ListSize2 = null;
         if($kelompok == 'full' OR $kelompok == 'mix' OR $kelompok == 'mix_color' OR $kelompok == 'ecer'){
           $ListSize2 = tampilkan_size_transaksi_packing_orc2($tanggal, $orc2);
         }
@@ -175,9 +177,10 @@ $result = mysqli_query($koneksi, $query) or die('gagal menampilkan data: ' . mys
         // }}
 
         //echo '<pre>' . json_encode($ListSize2, JSON_PRETTY_PRINT) . '</pre>';
+        if($ListSize2){
         while($size2 = mysqli_fetch_array($ListSize2 )){ ?>
           <th style="background-color:#20B2AA; color: #ffffff"><center><?= $size2['ukuran']; ?></center></th>
-        <?php } ?>
+        <?php }} ?>
     </tr>
 </thead>
 <tbody>
@@ -249,7 +252,7 @@ $size_data[$sz['detail_size']] = $sz['qty_size'];
     <td class="tengah"><?= $row['label']; ?></td>
 
     <?php 
-    $ListSize2 = [];
+    $ListSize2 = [] ?? '';
         if($kelompok == 'full' OR $kelompok == 'mix' OR $kelompok == 'mix_color' OR $kelompok == 'ecer'){
           $ListSize2 = tampilkan_size_transaksi_packing_orc2($tanggal, $orc2);
         }
@@ -271,7 +274,9 @@ $total_ctn += $val;
     <?php } else { ?>
     <td class="tengah"><b><?= $total_ctn ?></b></td>
     <?php } ?>
+    <?php if($kelompok == 'full' OR $kelompok == 'mix' OR $kelompok == 'mix_color' OR $kelompok == 'ecer'){ ?>
     <td class="tengah"><b><?= $row['qty']; ?></b></td>
+    <?php } else if($kelompok == 'mix_style'){ }?>
    
     <td class="tengah"><?php 
           if($row['kelompok'] == 'full'){
