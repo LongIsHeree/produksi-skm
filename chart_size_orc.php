@@ -19,7 +19,7 @@ FROM transaksi_carton tc
     JOIN barang B 
         ON TP.kode_barcode = B.kode_barcode
     WHERE TP.orc = '$orc'
-    AND tc.tanggal = '$tgl'
+    AND tc.tanggal <= '$tgl'
     GROUP BY B.size, B.cup
 ");
 

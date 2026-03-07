@@ -93,7 +93,7 @@ require_once 'view/header.php';
           </select>
       </div>
   </div>
-  <br />
+  <br/>
 
   <div class="row">
 

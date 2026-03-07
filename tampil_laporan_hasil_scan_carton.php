@@ -32,10 +32,7 @@ if($_POST['action'] == "table_data"){
         8 => 'i.category',
         9 => 'size'
     );
-
-
-    
-    $sql = "
+$sql = "
         SELECT 
             od.id_order,
             IFNULL(ts.line, 'pp.plan_line') as line,
@@ -49,14 +46,17 @@ if($_POST['action'] == "table_data"){
             i.category,
             tc.jumlah_carton,
             mo.status,
-            s.style
+            tp.kelompok,
+            s.style,
+            tp.no_trx as kode_barcode
         FROM (
     SELECT 
         orc,costomer,no_po,style,color,tanggal,
+        kode_barcode,
         SUM(qty_isi_karton) as total_qty,
         COUNT(kode_barcode) as jumlah_carton
     FROM $table
-    WHERE tanggal = '$tgl'
+    WHERE tanggal <= '$tgl'
     GROUP BY orc
 ) tc
         JOIN master_bundle mb 
@@ -71,12 +71,64 @@ if($_POST['action'] == "table_data"){
             ON mo.id_style = s.id_style
         JOIN items i
             ON i.item = s.item
+        JOIN transaksi_packing tp 
+            ON tp.no_trx = tc.kode_barcode
         LEFT JOIN transaksi_sewing ts 
             ON ts.kode_barcode = mb.barcode_bundle
     ";
+
+    
+//     $sql = "
+//         SELECT 
+//             od.id_order,
+//             IFNULL(ts.line, 'pp.plan_line') as line,
+//             tc.costomer,
+//             tc.no_po,
+//             tc.orc,
+//             tc.style,
+//             tc.color,
+//             mo.shipment_plan,
+//             i.category,
+//             mo.status,
+//             tp.kelompok,
+//             s.style,
+//             tp.no_trx as kode_barcode,
+//             tp.total_qty,
+//             tc.jumlah_carton
+//         FROM (
+//     SELECT 
+//         kelompok, no_trx,
+//         SUM(qty) as total_qty
+//     FROM transaksi_packing
+//     WHERE tanggal <= '$tgl' 
+//     GROUP BY orc
+// ) tp
+//         JOIN (
+//         SELECT *,
+//     COUNT(*) as jumlah_carton
+// FROM transaksi_carton
+// GROUP BY orc
+//         ) tc 
+//             ON tp.no_trx = tc.kode_barcode
+//         JOIN master_bundle mb 
+//             ON RIGHT(mb.barcode_bundle, LENGTH(tc.orc)) = tc.orc
+//         JOIN order_detail od 
+//             ON mb.id_order_detail = od.id_order_detail
+//         JOIN master_order mo 
+//             ON od.id_order = mo.id_order
+//         JOIN production_preparation pp 
+//             ON od.id_order = pp.id_order
+//         JOIN style s
+//             ON mo.id_style = s.id_style
+//         JOIN items i
+//             ON i.item = s.item
+        
+//         LEFT JOIN transaksi_sewing ts 
+//             ON ts.kode_barcode = mb.barcode_bundle
+//     ";
     if($checkstyle === 'iya'){
 if($line === 'all'){
-        $sql .= " WHERE tc.tanggal = '$tgl'
+        $sql .= " WHERE tc.tanggal <= '$tgl'
         AND tc.orc LIKE '%$orc%'
         AND tc.style LIKE '%$style%'
         AND tc.costomer LIKE '%$costomer%'
@@ -86,7 +138,7 @@ if($line === 'all'){
         AND s.style = '$style'
         GROUP BY tc.orc";
     } else {
-        $sql .= " WHERE tc.tanggal = '$tgl'
+        $sql .= " WHERE tc.tanggal <= '$tgl'
         AND tc.orc LIKE '%$orc%'
         AND tc.style LIKE '%$style%'
         AND tc.costomer LIKE '%$costomer%'
@@ -99,7 +151,7 @@ if($line === 'all'){
     }
     }else{
 if($line === 'all'){
-        $sql .= " WHERE tc.tanggal = '$tgl'
+        $sql .= " WHERE tc.tanggal <= '$tgl'
         AND tc.orc LIKE '%$orc%'
         AND tc.style LIKE '%$style%'
         AND tc.costomer LIKE '%$costomer%'
@@ -108,7 +160,7 @@ if($line === 'all'){
         AND mo.status = '$status'
         GROUP BY tc.orc";
     } else {
-        $sql .= " WHERE tc.tanggal = '$tgl'
+        $sql .= " WHERE tc.tanggal <= '$tgl'
         AND tc.orc LIKE '%$orc%'
         AND tc.style LIKE '%$style%'
         AND tc.costomer LIKE '%$costomer%'
@@ -153,8 +205,8 @@ if($line === 'all'){
 
     while($r = mysqli_fetch_array($query)){
       $size_data = [];
-        $orc_now = $r['orc'];
-
+      $orc_now = $r['orc'];
+if($r['kelompok'] == 'full' OR $r['kelompok'] == 'mix' OR $r['kelompok'] == 'mix_color' OR $r['kelompok'] == 'ecer'){
 $qSize = mysqli_query($koneksi,"
     SELECT 
         CONCAT(
@@ -169,13 +221,48 @@ $qSize = mysqli_query($koneksi,"
     JOIN barang B 
         ON TP.kode_barcode = B.kode_barcode
     WHERE TP.orc = '$orc_now'
-    AND tc.tanggal = '$tgl'
+    AND tc.tanggal <= '$tgl'
     GROUP BY B.size, B.cup
 ");
-
+}else if($r['kelompok'] == 'mix_style'){
+$qSize = mysqli_query($koneksi,"
+SELECT CONCAT(B.size, IFNULL(B.cup, ''))  as ukuran,
+  CONCAT('size_', lower(trim(replace(replace(B.size, '-', '_'), '/', '_'))), lower(TRIM(ifnull(B.cup,'')))) as detail_size ,
+  CONCAT('total_', lower(trim(replace(replace(B.size, '-', '_'), '/', '_'))), lower(TRIM(ifnull(B.cup,'')))) as total_size,
+  CONCAT('pilih2[&#39;size_',lower(trim(replace(replace(B.size, '-', '_'), '/', '_'))), lower(TRIM(ifnull(B.cup,''))),'&#39;]') as pilih_size,
+  A.qty as qty_size
+    FROM transaksi_packing A
+  JOIN barang B ON A.kode_barcode = B.kode_barcode
+  JOIN master_order C ON A.orc = C.orc
+  LEFT OUTER JOIN size F ON B.size = F.size AND IFNULL(B.cup, '') = IFNULL(F.cup, '')
+  WHERE A.tanggal <= '$tgl' AND A.no_trx = '{$r['kode_barcode']}' AND A.shipment = 'n' AND
+  A.kelompok = 'mix_style' AND C.status = 'open' AND  A.orc = '{$r['orc']}'
+  group by B.size, B.cup
+  ORDER BY F.urutan");
+}
         while($sz = mysqli_fetch_array($qSize)){
-            $size_data[$sz['detail_size']] = $sz['qty_size'];
+            if($r['kelompok'] == 'full' OR $r['kelompok'] == 'mix' OR $r['kelompok'] == 'mix_color' OR $r['kelompok'] == 'ecer'){
+$size_data[$sz['detail_size']] = $sz['qty_size'];
+      }
+        else if($r['kelompok'] == 'mix_style'){
+          $size_data[$sz['detail_size']] = $sz['qty_size'];
+
         }
+        }
+        //logic untuk keterangan
+        $ket = '';
+        if($r['kelompok'] == 'full'){
+            $ket = 'Full';
+        } else if($r['kelompok'] == 'mix'){
+            $ket = 'Mix';
+        } else if($r['kelompok'] == 'mix_color'){
+            $ket = 'Mix Color';
+        } else if($r['kelompok'] == 'mix_style'){
+            $ket = 'Mix Style';
+        } else if($r['kelompok'] == 'ecer'){
+            $ket = 'Ecer';
+        }
+        
         $nestedData = array();
         $nestedData['no'] = $no;
         $nestedData['line'] = strtoupper($r['line']);
@@ -187,8 +274,10 @@ $qSize = mysqli_query($koneksi,"
         $nestedData['shipment_plan'] = tgl_indonesia3($r['shipment_plan']);
         $nestedData['category'] = $r['category'];
         $nestedData['total_qty'] = $r['total_qty'];
-        $nestedData['jumlah_carton'] = $r['jumlah_carton'];
-
+        $nestedData['jumlah_carton'] = $r['jumlah_carton'] ?? 0;
+        $nestedData['ket'] = $ket ?? '';
+//var_dump($nestedData);
+  //      die();
         foreach($sizes as $sz){
         $nestedData[$sz] = $size_data[$sz] ?? 0;
     }
