@@ -29,10 +29,11 @@
                 }
 
                 $size = str_replace("/","-", $row['size']);
+                $cup = str_replace ("/","-", $row['cup']);
 
 
                 $no_bundle = sprintf("%02d", $qtyisibundle).sprintf("%02d", $i).sprintf("%02d", $jumlah_bundle);
-                $barcode_bundle = sprintf("%02d", $i)."-".$size.$row['cup'].$row['orc'];
+                $barcode_bundle = sprintf("%02d", $i)."-".$size.$cup.$row['orc'];
                 $id_order_detail = $row['id_order_detail'];
             
                 tambah_data_master_bundle($id_order_detail, $i, $no_bundle, $barcode_bundle, $qtyisibundle, $username);
