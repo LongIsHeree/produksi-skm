@@ -1,17 +1,17 @@
 <?php
 require_once 'core/init.php'; 
     $proses = 'carton';
-    $orc2 = $_GET['orc'] ?? '%';   
+    $orc2 = $_GET['orc'] ?? '%%';   
     $tanggal = date('Y-m-d');
     $sizes = [];
-    $query = "SELECT kelompok, no_trx FROM transaksi_packing WHERE orc = '$orc2'";
+    $query = "SELECT kelompok, no_trx FROM transaksi_packing WHERE orc LIKE '%$orc2%'";
     $result = mysqli_query($koneksi, $query);
     $kelompok = null;
     $data_kelompok = mysqli_fetch_array($result);
     $kelompok = $data_kelompok['kelompok'] ?? null;
     $kode_barcode = $data_kelompok['no_trx'] ?? null;
-    
-$ListSize2 = [] ?? '';
+
+      $ListSize2 = null;
         if($kelompok == 'full' OR $kelompok == 'mix' OR $kelompok == 'mix_color' OR $kelompok == 'ecer'){
           $ListSize2 = tampilkan_size_transaksi_packing_orc2($tanggal, $orc2);
         }
@@ -19,9 +19,10 @@ $ListSize2 = [] ?? '';
           $ListSize2 = tampilkan_size_transaksi_packing_mixstyle_notrx2($tanggal, $kode_barcode);
           //echo '<pre>' . json_encode('masuk mix style', JSON_PRETTY_PRINT) . '</pre>';
           }
+          if($ListSize2 instanceof mysqli_result){
 while($size2 = mysqli_fetch_array($ListSize2)){
     $sizes[] = $size2['detail_size']; 
-}
+}}
 ?>
 <style>
   td{
@@ -49,7 +50,7 @@ table.dataTable {
 <div style="margin-left: 20px; margin-right: 20px" id="tableContainer">
   <table border="1px"  class="table table-striped table-bordered row-border order-column display " id="example" style="font-size: 12px;">
   <?php 
-  $jumlahColspan = 0;
+  $jumlahColspan = 1;
       if($kelompok == 'full' OR $kelompok == 'mix' OR $kelompok == 'mix_color' OR $kelompok == 'ecer'){
         $jumlahColspan = cek_jumlah_size_orc2($tanggal, $orc2); 
 
@@ -67,6 +68,7 @@ table.dataTable {
           $jumlahColspan = mysqli_num_rows($query);
       }
   ?>
+  <?php if(count($sizes) > 0): ?>
     <thead>
       <tr>
         <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" rowspan=2>NO</th>
@@ -77,7 +79,7 @@ table.dataTable {
         <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" rowspan=2>STYLE</th>
         <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" rowspan=2>COLOR</th>
         <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" rowspan=2>SHIP DATE</th>
-        <th style="background-color:#20B2AA; color: #ffffff" colspan="<?= $jumlahColspan; ?>"><center>SIZE</center></th>
+        <th  style="background-color:#20B2AA; color: #ffffff" colspan="<?= $jumlahColspan; ?>"><center>SIZE</center></th>
         <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" rowspan=2>TOTAL QTY ISI KARTON</th>
         <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" rowspan=2>JUMLAH CARTON</th>
         <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" rowspan=2>KETERANGAN</th>
@@ -92,11 +94,31 @@ table.dataTable {
           $ListSize2 = tampilkan_size_transaksi_packing_mixstyle_notrx2($tanggal, $kode_barcode);
         }
         //$ListSize2 = tampilkan_size_transaksi_packing_orc2($tanggal, $orc2); 
+
+        if($ListSize2 instanceof mysqli_result && mysqli_num_rows($ListSize2)>0){
         while($size2 = mysqli_fetch_array($ListSize2)){ ?>
-          <th style="background-color:#20B2AA; color: #ffffff"><center><?= $size2['ukuran']; ?></center></th>
-        <?php } ?>
+          <th style="background-color:#20B2AA; color: #ffffff"><center><?= $size2['ukuran'] ?? '-'; ?></center></th>
+        <?php } }?>
       </tr>
     </thead>
+    <?php else: ?>
+<thead>
+      <tr>
+        <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >NO</th>
+        <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >LINE</th>
+        <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >COSTOMER</th>
+        <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >NO PO</th>
+        <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >ORC</th>
+        <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >STYLE</th>
+        <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >COLOR</th>
+        <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >SHIP DATE</th>
+        <th  style="background-color:#20B2AA; color: #ffffff" ><center>SIZE</center></th>
+        <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >TOTAL QTY ISI KARTON</th>
+        <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >JUMLAH CARTON</th>
+        <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >KETERANGAN</th>
+      </tr>
+    </thead>
+    <?php endif; ?>
     <tbody>
     </tbody>
     
@@ -121,6 +143,7 @@ table.dataTable {
           checkstyle = 'tidak';
         }
         let sizes = <?php echo json_encode($sizes); ?>;
+        //console.log("masuk sini");
  // kolom default
     let columns = [
         { data: "no" },
@@ -132,13 +155,25 @@ table.dataTable {
         { data: "color" },
         { data: "shipment_plan" }
     ];
- // tambahin kolom size dinamis
+if(sizes.length > 0){
+
     sizes.forEach(function(sz){
         columns.push({ data: sz });
     });
+
+}else{
+
+    columns.push({
+        data: null,
+        defaultContent: "-"
+    });
+
+}
     columns.push({ data: "total_qty" });
     columns.push({ data: "jumlah_carton" });
     columns.push({ data: "ket" });
+console.log("columns:", columns.length);
+console.log("sizes:", sizes);
             $('#example').DataTable({
               autoWidth: false,
         paging: false,

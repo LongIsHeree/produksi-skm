@@ -201,9 +201,14 @@ if($line === 'all'){
 
     $data = array();
     $no = $start + 1;
-    $sizes = get_size_orc($tgl, $orc) ?? [];
+    
 
     while($r = mysqli_fetch_array($query)){
+        if($r['kelompok'] == 'full' OR $r['kelompok'] == 'mix' OR $r['kelompok'] == 'mix_color' OR $r['kelompok'] == 'ecer'){
+    $sizes = get_size_orc($tgl, $orc) ?? [];}
+    else if($r['kelompok'] == 'mix_style'){
+      $sizes = get_size_orc_mix($tgl, $orc) ?? [];
+    }
       $size_data = [];
       $orc_now = $r['orc'];
 if($r['kelompok'] == 'full' OR $r['kelompok'] == 'mix' OR $r['kelompok'] == 'mix_color' OR $r['kelompok'] == 'ecer'){
@@ -276,8 +281,8 @@ $size_data[$sz['detail_size']] = $sz['qty_size'];
         $nestedData['total_qty'] = $r['total_qty'];
         $nestedData['jumlah_carton'] = $r['jumlah_carton'] ?? 0;
         $nestedData['ket'] = $ket ?? '';
-//var_dump($nestedData);
-  //      die();
+        //var_dump($nestedData);
+        //die();
         foreach($sizes as $sz){
         $nestedData[$sz] = $size_data[$sz] ?? 0;
     }

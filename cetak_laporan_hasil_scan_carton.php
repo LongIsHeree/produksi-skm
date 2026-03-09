@@ -137,8 +137,8 @@ require_once 'view/header.php';
       <input type="text" id="orc" class="form-control ganti" required>
     </div>
 
-    <div class="col-sm-3">
-      <font color="#254681"><b> <input type="checkbox" class="ganti" id="check_style" value="pilih_style"> STYLE </b></font> ( CHECKLIST UTK FILTER = )<br>
+    <div class="col-sm-2">
+      <font color="#254681"><b> <input type="checkbox" class="ganti" id="check_style" value="pilih_style"> STYLE </b>
       <input type="text" id="style" class="form-control ganti" required>
     </div>
 
@@ -153,6 +153,10 @@ require_once 'view/header.php';
             <option value = "<?= $hasil['nama_line'] ?>"> <?= strtoupper($hasil['nama_line']) ?></option>
           <?php } ?>
       </select>
+    </div>
+       <div class="col-sm-2">
+      <font color="#254681"><b>QR CODE NO</b>
+      <input type="text" id="qr_code" class="form-control ganti" required>
     </div>
 
     <div class="col-sm-1">
@@ -175,7 +179,7 @@ require_once 'view/header.php';
   <div class="row">
     <div id="tampil_tabel"></div>
   </div>
-    <div class="row">
+    <!-- <div class="row">
 
   <div class="col-sm-4">
     <div class="panel panel-default">
@@ -215,7 +219,7 @@ require_once 'view/header.php';
     </div>
   </div>
 
-</div>
+</div> -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script type="text/javascript">
   let chartSize;
@@ -491,7 +495,7 @@ function loadChartSize(){
 
   $('#refresh').on('click',function(){
     var proses = $('#proses').val();
-    let orc = $('#orc').val();
+    let orc = $('#orc').val() ?? '';
 
     // var tgl = $('#tanggal').val();
     // var orc = $('#orc').val();
@@ -507,8 +511,6 @@ function loadChartSize(){
     
    
     var url = "tampil_tabel_laporan_hasil_scan_carton.php?orc="+orc;
-    
-
     $('#tampil_tabel').load(url);
   });
 

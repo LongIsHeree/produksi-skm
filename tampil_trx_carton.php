@@ -222,7 +222,6 @@ $query_sz = mysqli_query($koneksi, "SELECT CONCAT('size_', lower(trim(replace(re
   group by B.size, B.cup
   ORDER BY F.urutan";
       $query_sz = mysqli_query($koneksi, $query_sz);
-
   }
   
     
