@@ -116,6 +116,7 @@ table.dataTable {
         <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >TOTAL QTY ISI KARTON</th>
         <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >JUMLAH CARTON</th>
         <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >KETERANGAN</th>
+        <th  style="text-align: center; background: #254681; color: white;" width="9%">ACTION</th>
       </tr>
     </thead>
     <?php endif; ?>
@@ -153,7 +154,7 @@ table.dataTable {
         { data: "orc" },
         { data: "style" },
         { data: "color" },
-        { data: "shipment_plan" }
+        { data: "shipment_plan" },
     ];
 if(sizes.length > 0){
 
@@ -170,8 +171,10 @@ if(sizes.length > 0){
 
 }
     columns.push({ data: "total_qty" });
-    columns.push({ data: "jumlah_carton" });
-    columns.push({ data: "ket" });
+    columns.push({ data: "jumlah_carton"});
+    columns.push({ data: "ket"});
+    columns.push({data : "aksi"});
+
 console.log("columns:", columns.length);
 console.log("sizes:", sizes);
             $('#example').DataTable({
@@ -218,7 +221,26 @@ initComplete: function(){
         });
    
 </script>
-
+<!-- Modal Edit Data data kelas-->
+<div id="myEdit" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
+  <!-- konten modal-->
+    <div class="modal-content">
+      <!-- heading modal -->
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title"><font face="Calibri" color="red"><b>DETAIL SIZE PROSES <?php if($proses == 'sewing'){ echo "INPUT SEWING"; }else{
+          echo strtoupper($proses); 
+        } ?></b></font></h4>
+      </div>
+      <!-- body modal -->
+      <div class="modal-body">
+        <div class="lihat-data"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal Edit data kelas-->
 
 <script type="text/javascript"> 
 $(document).ready(function() {
@@ -234,6 +256,22 @@ $(document).ready(function() {
     }).appendTo("body").get(0).click();
     e.preventDefault();
   });
-
+	$('body').on('show.bs.modal','#myEdit', function (e) {
+		    var rowedit = $(e.relatedTarget).data('id');
+        var proses =  $('#proses').val();
+        var tanggal = $('#tanggal').val();
+		//menggunakan fungsi ajax untuk pengembalian data
+		$.ajax({
+			type : 'post',
+			url	 : 'tampil_laporan_hasil_scan_global_detail.php',
+			data: { rowedit : rowedit,
+                proses : proses,
+                tanggal : tanggal
+            },
+			success : function(data) {
+				setTimeout(function(){$('.lihat-data').html(data);}, 1000);//menampilkan data ke dalam modal
+			}
+		});
+	});
 });
 </script>

@@ -217,9 +217,9 @@ require_once 'view/header.php';
         <div id="chartQty2"></div>
       </div>
     </div>
-  </div>
+  </div>-->
 
-</div> -->
+</div> 
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script type="text/javascript">
   let chartSize;
@@ -482,9 +482,9 @@ function loadChartSize(){
     });
 }
   $('.ganti').on('change',function(){
-    loadChartSize();
-    loadChartQty(); 
-    loadChartQty2();
+    //loadChartSize();
+    //loadChartQty(); 
+    //loadChartQty2();
     var proses = 'carton';
     let orc = $('#orc').val();
    var url = "tampil_tabel_laporan_hasil_scan_carton.php?orc="+orc;

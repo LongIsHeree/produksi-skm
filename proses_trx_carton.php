@@ -12,7 +12,10 @@
     $table = $_POST['table'];
     $proses = $_POST['proses'];
     $tipe = $_POST['tipe'];
-
+    
+    $cek_kelompok = mysqli_query($koneksi, "SELECT kelompok FROM transaksi_packing WHERE no_trx = '$kode_barcode'");
+    $data_kelompok = mysqli_fetch_array($cek_kelompok);
+    $kelompok = $data_kelompok['kelompok'] ?? null;
     if(cek_status($_SESSION['username'] ) != 'admin'){
         if(cek_status($_SESSION['username'] ) != $proses){
             $pesan = "error_username";
@@ -29,8 +32,7 @@ $query = "SELECT E.costomer, B.orc, B.no_po, B.label, D.style, B.color, C.warna,
           JOIN costomer E ON B.id_costomer = E.id_costomer
           LEFT OUTER JOIN size F on C.size = F.size AND IFNULL(C.cup, '') = IFNULL(F.cup, '')
           WHERE A.no_trx = $kode_barcode
-          Group By A.no_trx, C.id_style, B.orc
-          ORDER BY B.orc desc";
+          ORDER BY B.orc asc";
 
   $result = mysqli_query($koneksi, $query) or die('gagal menampilkan data');
   // Cek barcode ditemukan
@@ -38,8 +40,17 @@ if(mysqli_num_rows($result) == 0){
     echo "errorDb";
     die();
 }
+$data = null;
+if($kelompok == 'full'  OR $kelompok == 'ecer'){
+    $data = mysqli_fetch_assoc($result);
+  }else if($kelompok == 'mix_style' OR $kelompok == 'mix' OR $kelompok == 'mix_color'){
+    $data = [];
+while($row = mysqli_fetch_assoc($result)){
+    $data[] = $row;
+}
+  }
 
-$data = mysqli_fetch_assoc($result);
+
 
 // Cek apakah barcode sudah ada di temp table
 $cek = mysqli_query($koneksi, "
@@ -52,9 +63,20 @@ $cek = mysqli_query($koneksi, "
     SELECT 1 FROM $table
     WHERE kode_barcode = '$kode_barcode'
 ");
+
+if($kelompok == 'full'  OR $kelompok == 'ecer'){
 $cekORC = mysqli_query($koneksi, "SELECT * FROM $temp_table 
                                     WHERE orc != '{$data['orc']}'
                                     AND username = '$user'");
+} else if($kelompok == 'mix_style' OR $kelompok == 'mix' OR $kelompok == 'mix_color'){
+    foreach($data as $d){
+        $cekORC = mysqli_query($koneksi, "SELECT * FROM $temp_table 
+                                    WHERE orc != '{$d['orc']}'
+                                    AND username = '$user'");
+    }
+}
+
+                                    
 if(mysqli_num_rows($cekORC)>0){
     $pesan = 'beda_orc';
     echo $pesan;
@@ -88,20 +110,32 @@ while($sz = mysqli_fetch_assoc($query_size)){
     $kolom_size .= ", `{$sz['detail_size']}`";
     $nilai_size  .= ", '{$sz['qty']}'";
 }
-
-// INSERT dengan kolom size dinamis
+if($kelompok == 'full'  OR $kelompok == 'ecer'){
 $proses_db = mysqli_query($koneksi, "INSERT INTO $temp_table 
                                         (no_trx, orc, no_po, label, style, kode_barcode, color, costomer, qty , qty_isi_karton, username, tanggal, jam)
                                      VALUES 
                                         ('$no_trx_baru', '{$data['orc']}', '{$data['no_po']}', 
                                          '{$data['label']}', '{$data['style']}', '{$data['no_trx']}', '{$data['color']}', 
                                          '{$data['costomer']}', 1 , '{$data['qty']}', '$user', '$tanggal', '$jam')");
+}else if($kelompok == 'mix_style' OR $kelompok == 'mix' OR $kelompok == 'mix_color'){
+foreach($data as $d){
+// INSERT dengan kolom size dinamis
+$proses_db = mysqli_query($koneksi, "INSERT INTO $temp_table 
+                                        (no_trx, orc, no_po, label, style, kode_barcode, color, costomer, qty , qty_isi_karton, username, tanggal, jam)
+                                     VALUES 
+                                        ('$no_trx_baru', '{$d['orc']}', '{$d['no_po']}', 
+                                         '{$d['label']}', '{$d['style']}', '{$d['no_trx']}', '{$d['color']}', 
+                                         '{$d['costomer']}', 1 , '{$d['qty']}', '$user', '$tanggal', '$jam')");
+                                         }
+}
+
 if($proses_db){
     echo "success";
 } else {
     echo "errorDb";
 }
 }
+
 
 
  

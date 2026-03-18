@@ -76,8 +76,6 @@ $sql = "
         LEFT JOIN transaksi_sewing ts 
             ON ts.kode_barcode = mb.barcode_bundle
     ";
-
-    
 //     $sql = "
 //         SELECT 
 //             od.id_order,
@@ -136,7 +134,7 @@ if($line === 'all'){
         AND i.category LIKE '%$category%'
         AND mo.status = '$status'
         AND s.style = '$style'
-        GROUP BY tc.orc";
+        GROUP BY kode_barcode";
     } else {
         $sql .= " WHERE tc.tanggal <= '$tgl'
         AND tc.orc LIKE '%$orc%'
@@ -147,7 +145,7 @@ if($line === 'all'){
         AND line = '$line'
         AND mo.status = '$status'
         AND s.style = '$style'
-        GROUP BY tc.orc";
+        GROUP BY kode_barcode";
     }
     }else{
 if($line === 'all'){
@@ -158,7 +156,7 @@ if($line === 'all'){
         AND tc.no_po LIKE '%$no_po%'
         AND i.category LIKE '%$category%'
         AND mo.status = '$status'
-        GROUP BY tc.orc";
+        GROUP BY kode_barcode";
     } else {
         $sql .= " WHERE tc.tanggal <= '$tgl'
         AND tc.orc LIKE '%$orc%'
@@ -168,7 +166,7 @@ if($line === 'all'){
         AND i.category LIKE '%$category%'
         AND line = '$line'
         AND mo.status = '$status'
-        GROUP BY tc.orc";
+        GROUP BY kode_barcode";
     }
     }
     
@@ -257,15 +255,15 @@ $size_data[$sz['detail_size']] = $sz['qty_size'];
         //logic untuk keterangan
         $ket = '';
         if($r['kelompok'] == 'full'){
-            $ket = 'Full';
+            $ket = 'FULL';
         } else if($r['kelompok'] == 'mix'){
-            $ket = 'Mix';
+            $ket = 'MIX';
         } else if($r['kelompok'] == 'mix_color'){
-            $ket = 'Mix Color';
+            $ket = 'MIX COLOR';
         } else if($r['kelompok'] == 'mix_style'){
-            $ket = 'Mix Style';
+            $ket = 'MIX STYLE';
         } else if($r['kelompok'] == 'ecer'){
-            $ket = 'Ecer';
+            $ket = 'NOT FULL';
         }
         
         $nestedData = array();
@@ -281,6 +279,8 @@ $size_data[$sz['detail_size']] = $sz['qty_size'];
         $nestedData['total_qty'] = $r['total_qty'];
         $nestedData['jumlah_carton'] = $r['jumlah_carton'] ?? 0;
         $nestedData['ket'] = $ket ?? '';
+        $nestedData['aksi'] = '<button  id="edit" data-toggle="modal" data-target="#myEdit" style="width: 30px; padding: 0; margin: 0" class="edit_material btn btn-primary edit_komentar kecil" data-id="'.$r['id_order'].'" data-table="'.$table.'"><i class="glyphicon glyphicon-zoom-in"></i></button>';
+
         //var_dump($nestedData);
         //die();
         foreach($sizes as $sz){
