@@ -1942,6 +1942,27 @@ function tampilkan_laporan_bundle_record_global_detail($table, $tgl, $id_order)
   return $result;
 }
 
+function tampilkan_laporan_bundle_record_carton_detail($table, $tgl, $id_order)
+{
+  global $koneksi;
+
+
+  $query = " SELECT A.size B.* FROM 
+  (SELECT .id_order, C.orc, A.barcode_bundle, A.id_order_detail, A.qty_isi_bundle, C.status,
+   B.size, B.cup FROM master_bundle A
+   JOIN order_detail B ON A.id_order_detail = B.id_order_detail
+   JOIN master_order C ON B.id_order = C.id_order
+   ) A
+   JOIN $table B ON A.orc = B.orc
+  WHERE B.tanggal <= '$tgl'
+";
+
+
+  $result = mysqli_query($koneksi, $query) or die('gagal menampilkan data');
+
+  return $result;
+}
+
 function tampilkan_laporan_bundle_record_tv($table, $tgl, $orc, $style, $status, $costomer, $category, $plan_line, $jalan_line, $lantai)
 {
   global $koneksi;

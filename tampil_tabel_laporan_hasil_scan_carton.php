@@ -263,7 +263,7 @@ $(document).ready(function() {
 		//menggunakan fungsi ajax untuk pengembalian data
 		$.ajax({
 			type : 'post',
-			url	 : 'tampil_laporan_hasil_scan_global_detail.php',
+			url	 : 'tampil_laporan_hasil_scan_carton_detail.php',
 			data: { rowedit : rowedit,
                 proses : proses,
                 tanggal : tanggal
