@@ -117,6 +117,7 @@ table.dataTable {
         <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >JUMLAH CARTON</th>
         <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >KETERANGAN</th>
         <th  style="text-align: center; background: #254681; color: white;" width="9%">ACTION</th>
+        <th  style="text-align: center; background: #254681; vertical-align:middle; color: white;" >SHIPMENT STATUS</th>
       </tr>
     </thead>
     <?php endif; ?>
@@ -174,6 +175,16 @@ if(sizes.length > 0){
     columns.push({ data: "jumlah_carton"});
     columns.push({ data: "ket"});
     columns.push({data : "aksi"});
+    columns.push({
+    data: "shipment_status",
+    render: function(data, type, row) {
+        if (data == 'yes') {
+            return '<span class="label label-success">SHIPPED</span>';
+        } else {
+            return '<span class="label label-warning">NOT YET</span>';
+        }
+    }
+});
 
 console.log("columns:", columns.length);
 console.log("sizes:", sizes);
@@ -229,8 +240,8 @@ initComplete: function(){
       <!-- heading modal -->
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title"><font face="Calibri" color="red"><b>DETAIL SIZE PROSES <?php if($proses == 'sewing'){ echo "INPUT SEWING"; }else{
-          echo strtoupper($proses); 
+        <h4 class="modal-title"><font face="Calibri" color="red"><b>SHIPMENT STATUS<?php if($proses == 'sewing'){ echo "INPUT SEWING"; }else{
+
         } ?></b></font></h4>
       </div>
       <!-- body modal -->
@@ -256,17 +267,20 @@ $(document).ready(function() {
     }).appendTo("body").get(0).click();
     e.preventDefault();
   });
+
 	$('body').on('show.bs.modal','#myEdit', function (e) {
 		    var rowedit = $(e.relatedTarget).data('id');
         var proses =  $('#proses').val();
         var tanggal = $('#tanggal').val();
+        var orc = $('#orc').val();
 		//menggunakan fungsi ajax untuk pengembalian data
 		$.ajax({
 			type : 'post',
-			url	 : 'tampil_laporan_hasil_scan_carton_detail.php',
+			url	 : 'update_status_shipment.php',
 			data: { rowedit : rowedit,
                 proses : proses,
-                tanggal : tanggal
+                tanggal : tanggal,
+                orc : orc
             },
 			success : function(data) {
 				setTimeout(function(){$('.lihat-data').html(data);}, 1000);//menampilkan data ke dalam modal

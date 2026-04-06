@@ -48,13 +48,14 @@ $sql = "
             mo.status,
             tp.kelompok,
             s.style,
-            tp.no_trx as kode_barcode
+            tp.no_trx as kode_barcode,
+            tc.shipment_status
         FROM (
     SELECT 
         orc,costomer,no_po,style,color,tanggal,
-        kode_barcode,
+        kode_barcode, shipment_status,
         SUM(qty_isi_karton) as total_qty,
-        COUNT(kode_barcode) as jumlah_carton
+        SUM(qty) as jumlah_carton
     FROM $table
     WHERE tanggal <= '$tgl'
     GROUP BY orc
@@ -279,8 +280,8 @@ $size_data[$sz['detail_size']] = $sz['qty_size'];
         $nestedData['total_qty'] = $r['total_qty'];
         $nestedData['jumlah_carton'] = $r['jumlah_carton'] ?? 0;
         $nestedData['ket'] = $ket ?? '';
-        $nestedData['aksi'] = '<button  id="edit" data-toggle="modal" data-target="#myEdit" style="width: 30px; padding: 0; margin: 0" class="edit_material btn btn-primary edit_komentar kecil" data-id="'.$r['id_order'].'" data-table="'.$table.'"><i class="glyphicon glyphicon-zoom-in"></i></button>';
-
+        $nestedData['aksi'] = '<button  id="edit" data-toggle="modal" data-target="#myEdit" style="width: 30px; padding: 0; margin: 0" class="edit_material btn btn-primary edit_komentar kecil" data-id="'.$r['id_order'].'" data-table="'.$table.'"><i class="glyphicon glyphicon-edit"></i></button>';
+        $nestedData['shipment_status'] = $r['shipment_status'] ?? '';
         //var_dump($nestedData);
         //die();
         foreach($sizes as $sz){

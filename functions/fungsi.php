@@ -2105,6 +2105,16 @@ function tampilkan_laporan_bundle_record_carton_detail($table, $tgl, $id_order)
 
   return $result;
 }
+function update_status_shipment($id_order){
+  global $koneksi;
+
+  $query = "UPDATE transaksi_carton TC
+JOIN master_order MO ON TC.orc = MO.orc
+SET TC.status_shipment = 'yes'
+WHERE MO.id_order = $id_order";
+ $result = mysqli_query($koneksi, $query);
+return $result;
+}
 
 function tampilkan_laporan_bundle_record_tv($table, $tgl, $orc, $style, $status, $costomer, $category, $plan_line, $jalan_line, $lantai)
 {
