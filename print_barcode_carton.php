@@ -18,7 +18,7 @@ $arr_id = explode(",", $id);
     }
     .label-container {
       display: inline-block;
-      width: 24%;
+      width: 19%;
       vertical-align: top;
       margin-bottom: 5px;
       page-break-inside: avoid;
