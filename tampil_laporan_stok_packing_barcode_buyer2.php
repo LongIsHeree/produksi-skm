@@ -29,6 +29,7 @@
 <div style="margin-left: 20px; margin-right: 20px; margin-bottom: 20px;">
   <button style="background: #254681; color: white; margin: 4px 4px 4px; padding: 4px 4px 4px;" id="btnExportToExcel">Export To Excel</button>
   <button style="background: #9b0101; color: white; margin: 4px 4px 4px; padding: 4px 4px 4px;" id="btnExportToPdf">Print</button>
+  <button style="background: #3ce37c; color: white; margin: 4px 4px 4px; padding: 4px 4px 4px;" id="btnPrintBarcode">Print Barcode</button>
 </div>
 
 <div id="tableContainer">
@@ -242,6 +243,23 @@ window.addEventListener('load', function() {
  $('#btnExportToPdf').click(function(e) {
     e.preventDefault();
     window.print();
+});
+
+ $('#btnPrintBarcode').click(function(e) {
+    e.preventDefault();
+    var barcodes = [];
+    document.querySelectorAll('[data-barcode]').forEach(function(el) {
+      var val = el.getAttribute('data-barcode');
+      if (val && barcodes.indexOf(val) === -1) {
+        barcodes.push(val);
+      }
+    });
+    if (barcodes.length === 0) {
+      alert('Tidak ada barcode karton untuk dicetak.');
+      return;
+    }
+    var url = 'print_barcode_carton.php?id=' + barcodes.join(',');
+    window.open(url, '_blank');
 });
   });
 </script>
