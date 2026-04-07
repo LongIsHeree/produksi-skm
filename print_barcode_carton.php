@@ -60,6 +60,7 @@ $arr_id = explode(",", $id);
 <?php
 if (!empty($id)) {
   $count = 0;
+  $prev_orc = '';
   foreach ($arr_id as $no_trx) {
     $no_trx = trim($no_trx);
     if (empty($no_trx)) continue;
@@ -83,10 +84,22 @@ if (!empty($id)) {
     $color_val = $row['color'];
     $qty_val = $row['qty_ctn'];
     $count++;
+
+    // Separator antar ORC
+    if ($prev_orc != '' && $prev_orc != $orc_val) {
+      echo '<div style="width:100%; clear:both; border-top: 2px dashed #999; margin: 15px 0 10px 0;"></div>';
+    }
+    if ($prev_orc != $orc_val) {
+      echo '<div style="widths:100%; clear:both; font-size:11px; font-weight:bold; margin-bottom:5px; padding:3px 0; background:#f0f0f0; padding-left:5px;">ORC: ' . $orc_val . '</div>';
+    }
+    $prev_orc = $orc_val;
 ?>
 
 <div class="label-container">
   <table class="label-table">
+    <tr>
+      <td colspan="2" style="text-align:center; font-weight:bold; font-size:9px; padding:3px 4px;"><span class="data-label">PT. Globalindo Intimates</span></td>
+    </tr>
     <tr>
       <td class="qr-cell" rowspan="4">
         <div id="qrcode-<?= $count ?>" data-barcode="<?= $no_trx ?>"></div>
