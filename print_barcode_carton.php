@@ -117,23 +117,28 @@ $arr_id = explode(",", $id);
         continue;
 
       // Query data karton dari transaksi_packing
-      $query = "SELECT B.orc, D.style, B.color, SUM(A.qty) as qty_ctn
+      $query = "SELECT 
+                  GROUP_CONCAT(DISTINCT B.orc SEPARATOR ', ') as orc_val, 
+                  GROUP_CONCAT(DISTINCT D.style SEPARATOR ', ') as style_val, 
+                  GROUP_CONCAT(DISTINCT B.color SEPARATOR ', ') as color_val, 
+                  GROUP_CONCAT(DISTINCT CONCAT(C.size, IFNULL(C.cup, '')) ORDER BY F.urutan ASC SEPARATOR ', ') as size_val, 
+                  SUM(A.qty) as qty_ctn
               FROM transaksi_packing A
               JOIN master_order B ON A.orc = B.orc
               JOIN barang C ON A.kode_barcode = C.kode_barcode
               JOIN style D ON C.id_style = D.id_style
-              WHERE A.no_trx = '$no_trx' AND B.status = 'open'
-              GROUP BY B.orc, D.style, B.color
-              LIMIT 1";
+              LEFT JOIN size F ON C.size = F.size AND IFNULL(C.cup, '') = IFNULL(F.cup, '')
+              WHERE A.no_trx = '$no_trx' AND B.status = 'open'";
       $result = mysqli_query($koneksi, $query);
       $row = mysqli_fetch_array($result);
 
-      if (!$row)
+      if (!$row || empty($row['orc_val']))
         continue;
 
-      $orc_val = $row['orc'];
-      $style_val = $row['style'];
-      $color_val = $row['color'];
+      $orc_val = $row['orc_val'];
+      $style_val = $row['style_val'];
+      $color_val = $row['color_val'];
+      $size_val = $row['size_val'];
       $qty_val = $row['qty_ctn'];
       $count++;
 
@@ -175,6 +180,11 @@ $arr_id = explode(",", $id);
                   <td class="lbl">COLOR</td>
                   <td class="sep">:</td>
                   <td><?= $color_val ?></td>
+                </tr>
+                <tr>
+                  <td class="lbl">SIZE</td>
+                  <td class="sep">:</td>
+                  <td><?= $size_val ?></td>
                 </tr>
                 <tr>
                   <td class="lbl">QTY CTN</td>

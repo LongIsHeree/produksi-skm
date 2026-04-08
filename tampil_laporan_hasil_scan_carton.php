@@ -133,7 +133,7 @@ if($line === 'all'){
         AND tc.costomer LIKE '%$costomer%'
         AND tc.no_po LIKE '%$no_po%'
         AND i.category LIKE '%$category%'
-        AND mo.status = '$status'
+        AND tc.shipment_status = '$status'
         AND s.style = '$style'
         GROUP BY kode_barcode";
     } else {
@@ -144,7 +144,7 @@ if($line === 'all'){
         AND tc.no_po LIKE '%$no_po%'
         AND i.category LIKE '%$category%'
         AND line = '$line'
-        AND mo.status = '$status'
+        AND tc.shipment_status = '$status'
         AND s.style = '$style'
         GROUP BY kode_barcode";
     }
@@ -156,7 +156,7 @@ if($line === 'all'){
         AND tc.costomer LIKE '%$costomer%'
         AND tc.no_po LIKE '%$no_po%'
         AND i.category LIKE '%$category%'
-        AND mo.status = '$status'
+        AND tc.shipment_status = '$status'
         GROUP BY kode_barcode";
     } else {
         $sql .= " WHERE tc.tanggal <= '$tgl'
@@ -166,7 +166,7 @@ if($line === 'all'){
         AND tc.no_po LIKE '%$no_po%'
         AND i.category LIKE '%$category%'
         AND line = '$line'
-        AND mo.status = '$status'
+        AND tc.shipment_status = '$status'
         GROUP BY kode_barcode";
     }
     }
