@@ -20,7 +20,7 @@ $arr_id = explode(",", $id);
 
     .label-container {
       display: inline-block;
-      width: 24%;
+      width: 32%;
       vertical-align: top;
       margin-bottom: 5px;
       page-break-inside: avoid;
@@ -140,7 +140,7 @@ $arr_id = explode(",", $id);
           if (!in_array($row['color'], $colors)) $colors[] = $row['color'];
           
           $size_str = trim($row['size'] . $row['cup']);
-          $sizes[] = $size_str . " | " . $row['qty'] . " Pcs";
+          $sizes[] = $size_str . " [" . $row['qty'] . "]";
           $qty_ctn += $row['qty'];
       }
 
