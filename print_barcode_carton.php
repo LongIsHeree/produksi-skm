@@ -117,29 +117,41 @@ $arr_id = explode(",", $id);
         continue;
 
       // Query data karton dari transaksi_packing
-      $query = "SELECT 
-                  GROUP_CONCAT(DISTINCT B.orc SEPARATOR ', ') as orc_val, 
-                  GROUP_CONCAT(DISTINCT D.style SEPARATOR ', ') as style_val, 
-                  GROUP_CONCAT(DISTINCT B.color SEPARATOR ', ') as color_val, 
-                  GROUP_CONCAT(DISTINCT CONCAT(C.size, IFNULL(C.cup, '')) ORDER BY F.urutan ASC SEPARATOR ', ') as size_val, 
-                  SUM(A.qty) as qty_ctn
+      $query = "SELECT B.orc, D.style, B.color, C.size, C.cup, F.urutan, SUM(A.qty) as qty
               FROM transaksi_packing A
               JOIN master_order B ON A.orc = B.orc
               JOIN barang C ON A.kode_barcode = C.kode_barcode
               JOIN style D ON C.id_style = D.id_style
               LEFT JOIN size F ON C.size = F.size AND IFNULL(C.cup, '') = IFNULL(F.cup, '')
-              WHERE A.no_trx = '$no_trx' AND B.status = 'open'";
+              WHERE A.no_trx = '$no_trx' AND B.status = 'open'
+              GROUP BY B.orc, D.style, B.color, C.size, C.cup
+              ORDER BY F.urutan ASC";
       $result = mysqli_query($koneksi, $query);
-      $row = mysqli_fetch_array($result);
 
-      if (!$row || empty($row['orc_val']))
+      $orcs = [];
+      $styles = [];
+      $colors = [];
+      $sizes = [];
+      $qty_ctn = 0;
+
+      while ($row = mysqli_fetch_array($result)) {
+          if (!in_array($row['orc'], $orcs)) $orcs[] = $row['orc'];
+          if (!in_array($row['style'], $styles)) $styles[] = $row['style'];
+          if (!in_array($row['color'], $colors)) $colors[] = $row['color'];
+          
+          $size_str = trim($row['size'] . $row['cup']);
+          $sizes[] = $size_str . " | " . $row['qty'] . " Pcs";
+          $qty_ctn += $row['qty'];
+      }
+
+      if (empty($orcs))
         continue;
 
-      $orc_val = $row['orc_val'];
-      $style_val = $row['style_val'];
-      $color_val = $row['color_val'];
-      $size_val = $row['size_val'];
-      $qty_val = $row['qty_ctn'];
+      $orc_val = implode(', ', $orcs);
+      $style_val = implode(', ', $styles);
+      $color_val = implode(', ', $colors);
+      $size_val = implode(', ', $sizes);
+      $qty_val = $qty_ctn;
       $count++;
 
       // Separator antar ORC
