@@ -1181,7 +1181,7 @@ function cek_jumlah_bundle_persize($id_order_detail, $offsetbundle, $limit_baris
 }
 
 
-function cekCountSize($id_order, $offset,  $limitSize)
+function cekCountSize($id_order, $offset, $limitSize)
 {
   global $koneksi;
 
@@ -7775,8 +7775,10 @@ function run($query)
 {
   global $koneksi;
 
-  if (mysqli_query($koneksi, $query)) return true;
-  else return false;
+  if (mysqli_query($koneksi, $query))
+    return true;
+  else
+    return false;
 }
 
 
@@ -7786,7 +7788,7 @@ function run($query)
 function tanggal_indo($tanggal, $cetak_hari = false)
 {
   $hari = array(
-    1 =>    'Senin',
+    1 => 'Senin',
     'Selasa',
     'Rabu',
     'Kamis',
@@ -7796,7 +7798,7 @@ function tanggal_indo($tanggal, $cetak_hari = false)
   );
 
   $bulan = array(
-    1 =>   'Januari',
+    1 => 'Januari',
     'Februari',
     'Maret',
     'April',
@@ -7809,8 +7811,8 @@ function tanggal_indo($tanggal, $cetak_hari = false)
     'November',
     'Desember'
   );
-  $split     = explode('-', $tanggal);
-  $tgl_indo = $split[2] . ' ' . $bulan[(int)$split[1]] . ' ' . $split[0];
+  $split = explode('-', $tanggal);
+  $tgl_indo = $split[2] . ' ' . $bulan[(int) $split[1]] . ' ' . $split[0];
 
   if ($cetak_hari) {
     $num = date('N', strtotime($tanggal));
@@ -7822,7 +7824,7 @@ function tanggal_indo($tanggal, $cetak_hari = false)
 function tanggal_indo2($tanggal, $cetak_hari = false)
 {
   $hari = array(
-    1 =>    'SENIN',
+    1 => 'SENIN',
     'SELASA',
     'RABU',
     'KAMIS',
@@ -7832,7 +7834,7 @@ function tanggal_indo2($tanggal, $cetak_hari = false)
   );
 
   $bulan = array(
-    1 =>   'JANUARI',
+    1 => 'JANUARI',
     'FEBRUARI',
     'MARET',
     'APRIL',
@@ -7845,8 +7847,8 @@ function tanggal_indo2($tanggal, $cetak_hari = false)
     'NOVEMBER',
     'DESEMBER'
   );
-  $split     = explode('-', $tanggal);
-  $tgl_indo = $split[2] . ' ' . $bulan[(int)$split[1]] . ' ' . $split[0];
+  $split = explode('-', $tanggal);
+  $tgl_indo = $split[2] . ' ' . $bulan[(int) $split[1]] . ' ' . $split[0];
 
 
   if ($cetak_hari) {
@@ -7859,7 +7861,7 @@ function tanggal_indo2($tanggal, $cetak_hari = false)
 function tanggal_indo3($tanggal)
 {
 
-  $split     = explode('-', $tanggal);
+  $split = explode('-', $tanggal);
   $tgl_indo = $split[2] . '-' . $split[1] . '-' . $split[0];
 
   return $tgl_indo;
@@ -7867,14 +7869,14 @@ function tanggal_indo3($tanggal)
 
 function tgl_indonesia($date)
 {
-  $Hari = array("Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu",);
+  $Hari = array("Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", );
   $Bulan = array("Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember");
   $tahun = substr($date, 0, 4);
   $bulan = substr($date, 5, 2);
-  $tgl   = substr($date, 8, 2);
+  $tgl = substr($date, 8, 2);
   $waktu = substr($date, 11, 5);
-  $hari   = date("w", strtotime($date));
-  $result = $Hari[$hari] . ", " . $tgl . " " . $Bulan[(int)$bulan - 1] . " " . $tahun . " " . $waktu . " WIB";
+  $hari = date("w", strtotime($date));
+  $result = $Hari[$hari] . ", " . $tgl . " " . $Bulan[(int) $bulan - 1] . " " . $tahun . " " . $waktu . " WIB";
   return $result;
 }
 
@@ -7882,9 +7884,9 @@ function tgl_indonesia2($date)
 {
   $tahun = substr($date, 0, 4);
   $bulan = substr($date, 5, 2);
-  $tgl   = substr($date, 8, 2);
+  $tgl = substr($date, 8, 2);
   $waktu = substr($date, 11, 8);
-  $hari   = date("w", strtotime($date));
+  $hari = date("w", strtotime($date));
   $result = $tgl . "-" . $bulan . "-" . $tahun . " - " . $waktu . "";
   return $result;
 }
@@ -7893,8 +7895,8 @@ function tgl_indonesia3($date)
 {
   $tahun = substr($date, 0, 4);
   $bulan = substr($date, 5, 2);
-  $tgl   = substr($date, 8, 2);
-  $hari   = date("w", strtotime($date));
+  $tgl = substr($date, 8, 2);
+  $hari = date("w", strtotime($date));
   $result = $tgl . "-" . $bulan . "-" . $tahun . "";
   return $result;
 }
@@ -7903,40 +7905,40 @@ function tgl_indonesia4($date)
 {
   $tahun = substr($date, 0, 4);
   $bulan = substr($date, 5, 2);
-  $tgl   = substr($date, 8, 2);
-  $hari   = date("w", strtotime($date));
+  $tgl = substr($date, 8, 2);
+  $hari = date("w", strtotime($date));
   $result = $tgl . "/" . $bulan;
   return $result;
 }
 
 function tgl_indonesia5($date)
 {
-  $Hari = array("MINGGU", "SENIN", "SELASA", "RABU", "KAMIS", "JUM'AT", "SABTU",);
+  $Hari = array("MINGGU", "SENIN", "SELASA", "RABU", "KAMIS", "JUM'AT", "SABTU", );
   $Bulan = array("JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER");
   $tahun = substr($date, 0, 4);
   $bulan = substr($date, 5, 2);
-  $tgl   = substr($date, 8, 2);
+  $tgl = substr($date, 8, 2);
   $waktu = substr($date, 11, 5);
-  $hari   = date("w", strtotime($date));
-  $result = $Hari[$hari] . ", " . $tgl . " " . $Bulan[(int)$bulan - 1] . " " . $tahun;
+  $hari = date("w", strtotime($date));
+  $result = $Hari[$hari] . ", " . $tgl . " " . $Bulan[(int) $bulan - 1] . " " . $tahun;
   return $result;
 }
 
 function tgl_indonesia6($date)
 {
-  $Hari = array("MG", "SN", "SL", "RB", "KM", "JM", "SB",);
+  $Hari = array("MG", "SN", "SL", "RB", "KM", "JM", "SB", );
 
-  $tgl   = substr($date, 8, 2);
-  $hari   = date("w", strtotime($date));
+  $tgl = substr($date, 8, 2);
+  $hari = date("w", strtotime($date));
   $result = $tgl . "-" . $Hari[$hari];
   return $result;
 }
 
 function tgl_indonesia_hari($date)
 {
-  $Hari = array("MINGGU", "SENIN", "SELASA", "RABU", "KAMIS", "JUM'AT", "SABTU",);
+  $Hari = array("MINGGU", "SENIN", "SELASA", "RABU", "KAMIS", "JUM'AT", "SABTU", );
 
-  $hari   = date("w", strtotime($date));
+  $hari = date("w", strtotime($date));
   $result = $Hari[$hari];
   return $result;
 }

@@ -106,7 +106,7 @@ $error = '';
             $_SESSION['username'] = $username;
             $_SESSION['monitor'] = $username;
           if(cek_status($_SESSION['username'] ) == 'admin'){
-          header('Location: master_barang2.php');
+          header('Location: landing_page.php');
           }elseif(cek_status($_SESSION['username'] ) == 'packing_outerware'){
             header('Location: temp_packing.php');
           }elseif(cek_status($_SESSION['username'] ) == 'kenzin'){
