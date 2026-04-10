@@ -95,6 +95,12 @@ if ($ListSize2 instanceof mysqli_result) {
             CARTON</th>
           <th style="text-align: center; background: #254681; vertical-align:middle; color: white;" rowspan=2>KETERANGAN
           </th>
+          <th style="text-align: center; background: #254681; vertical-align:middle; color: white;" rowspan=2 width="9%">
+            ACTION
+          </th>
+          <th style="text-align: center; background: #254681; vertical-align:middle; color: white;" rowspan=2>SHIPMENT
+            STATUS
+          </th>
         </tr>
         <tr>
           <?php
@@ -127,7 +133,7 @@ if ($ListSize2 instanceof mysqli_result) {
           <th style="text-align: center; background: #254681; vertical-align:middle; color: white;">COLOR</th>
           <th style="text-align: center; background: #254681; vertical-align:middle; color: white;">SHIP DATE</th>
           <th style="background-color:#20B2AA; color: #ffffff">
-            <center>SIZE</center>
+            <center>-</center>
           </th>
           <th style="text-align: center; background: #254681; vertical-align:middle; color: white;">TOTAL QTY ISI KARTON
           </th>

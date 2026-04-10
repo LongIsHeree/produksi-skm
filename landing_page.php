@@ -32,7 +32,7 @@ if (!isset($_SESSION['username'])) {
 
 <div class="video-container">
   <video autoplay muted loop playsinline>
-    <source src="assets/images/COMPANY PROFILE PT. GLOBALINDO INTIMATES.mp4" type="video/mp4">
+    <source src="assets/images/vid.mp4" type="video/mp4">
     Browser Anda tidak mendukung tag video.
   </video>
 </div>
